@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add any global base styles here */
+body {
+  font-family: sans-serif; /* Example base font */
+  background-color: theme('colors.brand-background');
+  color: theme('colors.brand-text');
+}
+
+/* Utility to hide scrollbars */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
