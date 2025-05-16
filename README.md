@@ -1,54 +1,60 @@
-# React + TypeScript + Vite
+# Sport Counter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![LocalStorage](https://img.shields.io/badge/LocalStorage-F8DD35?style=for-the-badge&logo=javascript&logoColor=black)
 
-Currently, two official plugins are available:
+A modern, minimalist workout and body weight tracking application designed for simplicity and efficiency. Built with a focus on a clean, responsive user interface, it allows users to seamlessly track their fitness progress on both desktop and mobile devices. The entire application operates client-side, utilizing `localStorage` for data persistence, ensuring your data stays private and on your device.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ⚠️ Disclaimer
 
-## Expanding the ESLint configuration
+This project was heavily scaffolded and partially written by an AI. As a result, the codebase may not follow standard architectural patterns, may include inefficient structures, and can be hard to maintain or scale.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The logic might not be fully optimized, and some parts of the code may appear unclear, redundant, or inconsistent.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Manual refactoring and review are highly recommended before using it in production or building upon it for serious use.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ✨ Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+-  **Daily Weight Logging:** Track your body weight before and after workouts.
+-  **Exercise Tracking:** Log exercises with details for sets, repetitions, and optional weight.
+-  **Intelligent Suggestions:** Get suggestions for exercises based on your past entries.
+-  **Calendar Navigation:** Easily review your workout history and progress on specific days.
+-  **Autocomplete & Prefill:** Speeds up data entry by autocompleting and prefilling previously logged exercises.
+-  **Fully Responsive UI:** Optimized for a seamless experience across desktop, tablet, and mobile devices.
+-  **Client-Side Storage:** All data is stored locally in your browser using `localStorage`, ensuring privacy and offline access.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## 🛠️ Tech Stack
+
+-  **Frontend:** React
+-  **Build Tool:** Vite
+-  **JavaScript Runtime & Package Manager:** Bun
+-  **Styling:** Tailwind CSS v3
+-  **Language:** TypeScript
+-  **Data Persistence:** Browser `localStorage`
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Ensure you have [Bun](https://bun.sh/) installed on your system.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://your-repository-url.git
+   cd sport-counter
+   ```
+2. Install dependencies using Bun:
+   ```bash
+   bun install
+   ```
+3. Start the development server:
+   ```bash
+   bun run dev
+   ```
+   The application will typically be available at `http://localhost:5173` (or another port if 5173 is in use).
