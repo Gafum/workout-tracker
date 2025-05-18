@@ -44,11 +44,7 @@ Ensure you have [Bun](https://bun.sh/) installed on your system.
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://your-repository-url.git
-   cd sport-counter
-   ```
+1. Clone the repository
 2. Install dependencies using Bun:
    ```bash
    bun install
