@@ -1,6 +1,7 @@
 // Import necessary date functions
-import { format } from "date-fns";
+import { format, subDays, startOfDay } from "date-fns"; // Added startOfDay
 import { POPULAR_EXERCISES } from "./PopularExercises";
+import { IExerciseEntry } from "../Types/AppTypes"; // Import IExerciseEntry type
 
 // Constants
 const EXERCISE_STORAGE_KEY = "sport-counter-exercises";
@@ -90,7 +91,7 @@ const updateExerciseNamesList = (exercises: any[]) => {
          .filter((name) => 
             name && 
             typeof name === "string" && 
-            !standardExercises.includes(name)
+            !standardExercises.some(stdName => stdName.toLowerCase() === name.toLowerCase())
          );
 
       // Combine and deduplicate
@@ -176,4 +177,126 @@ export const saveWeightForDay = (date: Date, weightData: any) => {
       console.error("Error saving weight data for day:", error);
       return false;
    }
+};
+
+// Update an exercise name in the saved list
+export const updateExerciseName = (oldName: string, newName: string): boolean => {
+  try {
+    // Get current exercise names
+    const exerciseNames = getAllExerciseNames();
+    
+    // Find the index of the old name
+    const index = exerciseNames.findIndex(
+      name => name.toLowerCase() === oldName.toLowerCase()
+    );
+    
+    // If found, update it
+    if (index !== -1) {
+      exerciseNames[index] = newName;
+      localStorage.setItem(EXERCISE_NAMES_KEY, JSON.stringify(exerciseNames));
+      
+      // Also update the name in all saved exercises
+      updateExerciseNameInSavedExercises(oldName, newName);
+      
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error("Error updating exercise name:", error);
+    return false;
+  }
+};
+
+// Remove an exercise name from the saved list
+export const removeExerciseName = (exerciseName: string): boolean => {
+  try {
+    // Get current exercise names
+    const exerciseNames = getAllExerciseNames();
+    
+    // Filter out the name to remove
+    const updatedNames = exerciseNames.filter(
+      name => name.toLowerCase() !== exerciseName.toLowerCase()
+    );
+    
+    // Save the updated list
+    localStorage.setItem(EXERCISE_NAMES_KEY, JSON.stringify(updatedNames));
+    
+    return true;
+  } catch (error) {
+    console.error("Error removing exercise name:", error);
+    return false;
+  }
+};
+
+// Update exercise name in all saved exercises
+const updateExerciseNameInSavedExercises = (oldName: string, newName: string): void => {
+  try {
+    const allExercises = loadAllExercises();
+    
+    // Go through each day's exercises
+    Object.keys(allExercises).forEach(dateKey => {
+      const dayExercises = allExercises[dateKey];
+      
+      // Check if any exercise on this day needs updating
+      let updated = false;
+      dayExercises.forEach(exercise => {
+        if (exercise.name.toLowerCase() === oldName.toLowerCase()) {
+          exercise.name = newName;
+          updated = true;
+        }
+      });
+      
+      // If we updated any exercise, save the changes
+      if (updated) {
+        allExercises[dateKey] = dayExercises;
+      }
+    });
+    
+    // Save all updated exercises
+    saveAllExercises(allExercises);
+  } catch (error) {
+    console.error("Error updating exercise name in saved exercises:", error);
+  }
+};
+
+// Get exercises for the last 7 days and format them nicely
+export const getExercisesLastWeekFormatted = (): string => {
+  try {
+    const today = startOfDay(new Date());
+    let formattedOutput = "Workout Summary (Last 7 Days):\n\n";
+    let hasData = false;
+
+    for (let i = 6; i >= 0; i--) {
+      const date = subDays(today, i);
+      const exercisesForDay = loadExercisesForDay(date) as IExerciseEntry[]; // Cast to IExerciseEntry[]
+
+      if (exercisesForDay && exercisesForDay.length > 0) {
+        hasData = true;
+        formattedOutput += `--- ${format(date, "yyyy-MM-dd (EEE)")} ---\n`;
+        exercisesForDay.forEach(exercise => {
+          formattedOutput += `  ${exercise.name}:\n`;
+          exercise.sets.forEach((set, index) => {
+            formattedOutput += `    Set ${index + 1}: ${set.reps} reps`;
+            if (set.weight !== undefined && set.weight !== null && set.weight !== "") {
+              // Changed '@' to 'x' and added space
+              formattedOutput += ` x ${set.weight} kg`;
+            }
+            formattedOutput += "\n";
+          });
+          formattedOutput += "\n"; // Add a blank line after each exercise block
+        });
+        formattedOutput += "\n"; // Add a blank line between days
+      }
+    }
+
+    if (!hasData) {
+      return "No exercise data found for the last 7 days.";
+    }
+
+    return formattedOutput.trim(); // Remove trailing newline/space
+  } catch (error) {
+    console.error("Error getting exercises for last week:", error);
+    return "Error retrieving exercise data.";
+  }
 };

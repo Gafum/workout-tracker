@@ -290,7 +290,8 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                      <li
                         key={index}
                         onClick={() => handleSuggestionClick(name)}
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-green/10 cursor-pointer transition-colors duration-100 ease-in-out"
+                        // Added break-words class for long names
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-green/10 cursor-pointer transition-colors duration-100 ease-in-out break-words"
                      >
                         {name}
                      </li>
@@ -374,7 +375,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <button
                type="submit"
-               // Adjusted padding, text size, slightly softer shadow
+               // Adjusted padding, text size, slightly softer
                className={`w-full sm:w-auto order-1 sm:order-2 px-6 py-3 text-white text-sm font-semibold rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-150 ease-in-out ${
                   isEditing
                      ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"

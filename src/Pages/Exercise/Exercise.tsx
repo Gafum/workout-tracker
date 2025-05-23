@@ -14,6 +14,8 @@ import { LoggedExerciseList } from "../../Components/ExercisePage/LoggedExercise
 
 // --- Types ---
 // Ensure these are exported
+// REMOVE these type definitions:
+/*
 export interface IExerciseSet {
    id: string;
    reps: string | number;
@@ -24,7 +26,11 @@ export interface IExerciseEntry {
    name: string;
    sets: IExerciseSet[];
 }
+*/
 // --- End of Types ---
+
+// ADD this import:
+import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 
 interface IExerciseProps {
    selectedDate: Date;
@@ -306,7 +312,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          {/* Heading */}
-         <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6 flex flex-wrap justify-between items-center gap-1 sm:gap-2">
+         <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6 flex flex-wrap justify-between items-center gap-1 sm:gap-2 text-left">
             <span className="flex-shrink min-w-0">
                {editingExercise
                   ? `Editing: ${editingExercise.name}`
@@ -378,3 +384,5 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       </div>
    );
 };
+
+export type { IExerciseEntry };

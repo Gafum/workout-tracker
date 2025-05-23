@@ -1,23 +1,35 @@
-import React from 'react';
-import { TypeAppMode } from '../../Types/AppTypes';
+import React from "react";
+import { TypeAppMode } from "../../Types/AppTypes";
 // Import icons
 import { FaWeightHanging, FaDumbbell } from 'react-icons/fa';
+import { useAppContext } from "../../Context/AppContext"; // Import useAppContext
 
 interface IMobileNavProps {
     currentMode: TypeAppMode;
     onModeChange: (mode: TypeAppMode) => void;
+    // Removed activePage prop here, will use context directly
 }
 
 export const MobileNav: React.FC<IMobileNavProps> = ({ currentMode, onModeChange }) => {
+    const { activePage } = useAppContext(); // Use context to get activePage
+
     const getButtonClasses = (mode: TypeAppMode) => {
         // Adjusted base classes: slightly larger text, more padding
         const baseClasses = "flex flex-col items-center justify-center flex-1 py-3 text-xs sm:text-sm font-medium transition-colors duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-green"; // Added focus styles
+
+        // If the active page is 'settings', always return the inactive state classes
+        if (activePage === 'settings') {
+             // Removed hover:text-brand-green-dark to keep it simple white/gray
+             return `${baseClasses} text-gray-500`;
+        }
+
+        // Otherwise, use the existing logic based on currentMode
         if (mode === currentMode) {
             // Active state: brand color background, white text, slightly bolder font
             return `${baseClasses} bg-brand-green text-white font-semibold`;
         }
         // Inactive state: subtle gray, brighter green on hover
-        return `${baseClasses} text-gray-500 hover:text-brand-green-dark`;
+        return `${baseClasses} bg-white text-gray-500 hover:text-brand-green-dark`;
     };
 
     return (
@@ -26,7 +38,8 @@ export const MobileNav: React.FC<IMobileNavProps> = ({ currentMode, onModeChange
             <button
                 onClick={() => onModeChange('weight')}
                 className={getButtonClasses('weight')}
-                aria-current={currentMode === 'weight' ? 'page' : undefined} // Accessibility improvement
+                aria-current={activePage !== 'settings' && currentMode === 'weight' ? 'page' : undefined} // Accessibility improvement, only mark as current if not on settings page
+                // Removed disabled attribute
             >
                 {/* Added Icon */}
                 <FaWeightHanging className="w-5 h-5 mb-1" />
@@ -35,7 +48,8 @@ export const MobileNav: React.FC<IMobileNavProps> = ({ currentMode, onModeChange
             <button
                 onClick={() => onModeChange('exercise')}
                 className={getButtonClasses('exercise')}
-                aria-current={currentMode === 'exercise' ? 'page' : undefined} // Accessibility improvement
+                aria-current={activePage !== 'settings' && currentMode === 'exercise' ? 'page' : undefined} // Accessibility improvement, only mark as current if not on settings page
+                // Removed disabled attribute
             >
                  {/* Added Icon */}
                 <FaDumbbell className="w-5 h-5 mb-1" />

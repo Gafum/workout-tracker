@@ -1,5 +1,9 @@
 import React from "react";
-import { IExerciseEntry } from "../../Pages/Exercise/Exercise"; // Adjust path if IExerciseEntry is moved
+// REMOVE this import:
+// import { IExerciseEntry } from "../../Pages/Exercise/Exercise"; // Adjust path if IExerciseEntry is moved
+
+// ADD this import:
+import { IExerciseEntry } from "../../Types/AppTypes";
 
 interface IImportExerciseListProps {
    importExercises: IExerciseEntry[];

@@ -12,11 +12,16 @@ export interface IScreenList {
 }
 
 // New type for a single exercise entry
+export interface IExerciseSet {
+    id: string;
+    reps: string | number;
+    weight?: string | number;
+}
+
 export interface IExerciseEntry {
-    id: string; // Unique ID for the entry (e.g., timestamp or uuid)
+    id: string;
     name: string;
-    sets: number;
-    reps: number;
+    sets: IExerciseSet[];
 }
 
 // New type for daily exercise data
