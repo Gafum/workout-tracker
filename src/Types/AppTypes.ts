@@ -13,6 +13,7 @@ export interface IScreenList {
 
 // New type for a single exercise entry
 export interface IExerciseSet {
+    notes: any;
     id: string;
     reps: string | number;
     weight?: string | number;

@@ -42,7 +42,8 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    // --- State ---
    const [dailyExercises, setDailyExercises] = useState<IExerciseEntry[]>([]);
    const [suggestionSource, setSuggestionSource] = useState<string[]>([]);
-   const [editingExercise, setEditingExercise] = useState<IExerciseEntry | null>(null);
+   const [editingExercise, setEditingExercise] =
+      useState<IExerciseEntry | null>(null);
    const [formKey, setFormKey] = useState<string>(`new-${Date.now()}`);
    const [showCalendar, setShowCalendar] = useState<boolean>(false); // For Import Modal visibility
    const [importDate, setImportDate] = useState<Date | null>(null);
@@ -50,13 +51,12 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    const calendarRef = useRef<HTMLDivElement>(null); // Ref for the import modal
    const [selectedToImport, setSelectedToImport] = useState<string[]>([]);
 
-
    // --- useEffect ---
    useEffect(() => {
-      console.log('Selected date:', selectedDate);
+      console.log("Selected date:", selectedDate);
       const loadedData = loadExercisesForDay(selectedDate);
-      console.log('Loaded data:', loadedData);
-      
+      console.log("Loaded data:", loadedData);
+
       const validatedExercises: IExerciseEntry[] = Array.isArray(loadedData)
          ? loadedData
               .map((item: any) => {
@@ -72,10 +72,10 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
               })
               .filter((item): item is IExerciseEntry => item !== null)
          : [];
-      
-      console.log('Validated exercises:', validatedExercises);
+
+      console.log("Validated exercises:", validatedExercises);
       setDailyExercises(validatedExercises);
-      
+
       // Fix: Create combinedUniqueNames from POPULAR_EXERCISES and saved exercises
       const savedExerciseNames = getAllExerciseNames();
       const combinedUniqueNames = Array.from(
@@ -107,7 +107,11 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             sets: sets,
          };
          updatedExercises = [...dailyExercises, newEntry];
-         if (!suggestionSource.some((n) => n.toLowerCase() === name.toLowerCase())) {
+         if (
+            !suggestionSource.some(
+               (n) => n.toLowerCase() === name.toLowerCase()
+            )
+         ) {
             setSuggestionSource((prevSource) => [name, ...prevSource]);
          }
       }
@@ -140,13 +144,12 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          selectedDate,
          updatedExercises as unknown as import("../../Types/AppTypes").IExerciseEntry[]
       );
-       // If deleting the item currently being edited, reset the form
+      // If deleting the item currently being edited, reset the form
       if (editingExercise?.id === idToDelete) {
-          setEditingExercise(null);
-          setFormKey(`new-${Date.now()}`);
+         setEditingExercise(null);
+         setFormKey(`new-${Date.now()}`);
       }
    };
-
 
    const handleCancelEdit = () => {
       setEditingExercise(null);
@@ -162,11 +165,14 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    // Effect to handle clicking outside import modal
    useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
-         if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+         if (
+            calendarRef.current &&
+            !calendarRef.current.contains(event.target as Node)
+         ) {
             setShowCalendar(false);
          }
       }
-      
+
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
          document.removeEventListener("mousedown", handleClickOutside);
@@ -178,7 +184,9 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       if (importDate) {
          const exercises = loadExercisesForDay(importDate);
          // Ensure correct parsing of loaded exercises for import
-         const validatedImportExercises: IExerciseEntry[] = Array.isArray(exercises)
+         const validatedImportExercises: IExerciseEntry[] = Array.isArray(
+            exercises
+         )
             ? exercises
                  .map((item: any) => {
                     if (item && typeof item.name === "string" && item.id) {
@@ -205,15 +213,19 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    const handleDateSelect = (date: Date) => {
       // To prevent issues with timezones making the date appear as "yesterday"
       // we ensure the date is set to local midnight.
-      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const localDate = new Date(
+         date.getFullYear(),
+         date.getMonth(),
+         date.getDate()
+      );
       setImportDate(localDate);
    };
 
    // Handler for toggling exercise selection for import
    const handleToggleSelectExercise = (exerciseId: string) => {
-      setSelectedToImport(prevSelected =>
+      setSelectedToImport((prevSelected) =>
          prevSelected.includes(exerciseId)
-            ? prevSelected.filter(id => id !== exerciseId)
+            ? prevSelected.filter((id) => id !== exerciseId)
             : [...prevSelected, exerciseId]
       );
    };
@@ -225,31 +237,41 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          return;
       }
 
-      const exercisesToActuallyImport = importExercises.filter(ex => selectedToImport.includes(ex.id));
+      const exercisesToActuallyImport = importExercises.filter((ex) =>
+         selectedToImport.includes(ex.id)
+      );
 
       // Removed window.confirm, proceed directly with import
       let currentDailyExercises = [...dailyExercises];
 
-      exercisesToActuallyImport.forEach(exerciseToImport => {
+      exercisesToActuallyImport.forEach((exerciseToImport) => {
          const existingIndex = currentDailyExercises.findIndex(
-            ex => ex.name.toLowerCase() === exerciseToImport.name.toLowerCase()
+            (ex) =>
+               ex.name.toLowerCase() === exerciseToImport.name.toLowerCase()
          );
 
-         const newSets = exerciseToImport.sets.map(set => ({
+         const newSets = exerciseToImport.sets.map((set) => ({
             ...set,
-            id: Date.now().toString() + Math.random().toString(36).substring(2, 7) // New unique set IDs
+            id:
+               Date.now().toString() +
+               Math.random().toString(36).substring(2, 7), // New unique set IDs
          }));
 
-         if (existingIndex >= 0) { // Exercise with the same name exists, update its sets
+         if (existingIndex >= 0) {
+            // Exercise with the same name exists, update its sets
             currentDailyExercises[existingIndex] = {
                ...currentDailyExercises[existingIndex],
-               sets: newSets
+               sets: newSets,
             };
-         } else { // Exercise does not exist, add it as a new entry
+         } else {
+            // Exercise does not exist, add it as a new entry
             currentDailyExercises.push({
-               id: Date.now().toString() + Math.random().toString(36).substring(2, 7) + '_imported', // New unique exercise ID
+               id:
+                  Date.now().toString() +
+                  Math.random().toString(36).substring(2, 7) +
+                  "_imported", // New unique exercise ID
                name: exerciseToImport.name,
-               sets: newSets
+               sets: newSets,
             });
          }
       });
@@ -271,26 +293,34 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       // Removed window.confirm, proceed directly with import
       let currentDailyExercises = [...dailyExercises];
 
-      importExercises.forEach(exerciseToImport => {
+      importExercises.forEach((exerciseToImport) => {
          const existingIndex = currentDailyExercises.findIndex(
-            ex => ex.name.toLowerCase() === exerciseToImport.name.toLowerCase()
+            (ex) =>
+               ex.name.toLowerCase() === exerciseToImport.name.toLowerCase()
          );
-         
-         const newSets = exerciseToImport.sets.map(set => ({
-             ...set,
-             id: Date.now().toString() + Math.random().toString(36).substring(2, 7) // New unique set IDs
+
+         const newSets = exerciseToImport.sets.map((set) => ({
+            ...set,
+            id:
+               Date.now().toString() +
+               Math.random().toString(36).substring(2, 7), // New unique set IDs
          }));
 
-         if (existingIndex >= 0) { // Exercise exists, update it
+         if (existingIndex >= 0) {
+            // Exercise exists, update it
             currentDailyExercises[existingIndex] = {
                ...currentDailyExercises[existingIndex],
-               sets: newSets
+               sets: newSets,
             };
-         } else { // Exercise does not exist, add it
+         } else {
+            // Exercise does not exist, add it
             currentDailyExercises.push({
-               id: Date.now().toString() + Math.random().toString(36).substring(2, 7) + '_imported_all', // New exercise ID
+               id:
+                  Date.now().toString() +
+                  Math.random().toString(36).substring(2, 7) +
+                  "_imported_all", // New exercise ID
                name: exerciseToImport.name,
-               sets: newSets
+               sets: newSets,
             });
          }
       });
@@ -301,45 +331,47 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       setShowCalendar(false); // Close modal after import
    };
 
-
    const formattedDate = format(selectedDate, "MMMM d, yyyy");
-   const formattedImportDate = importDate ? format(importDate, "MMMM d, yyyy") : "";
+   const formattedImportDate = importDate
+      ? format(importDate, "MMMM d, yyyy")
+      : "";
    // Calculate max date for the import date picker (today)
    const maxImportDate = format(new Date(), "yyyy-MM-dd");
-
-
 
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          {/* Heading */}
          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6 flex flex-wrap justify-between items-center gap-1 sm:gap-2 text-left">
             <span className="flex-shrink min-w-0">
-               {editingExercise
-                  ? `Editing: ${editingExercise.name}`
-                  : (
-                     <>
-                        <span className="sm:hidden">Exercise</span>
-                        <span className="hidden sm:inline">{`Log Exercise for ${formattedDate}`}</span>
-                     </>
-                  )
-               }
+               {editingExercise ? (
+                  `Editing: ${editingExercise.name}`
+               ) : (
+                  <>
+                     <span className="sm:hidden">Exercise</span>
+                     <span className="hidden sm:inline">{`Log Exercise for ${formattedDate}`}</span>
+                  </>
+               )}
             </span>
-            
+
             {!editingExercise && (
                <button
-                  onClick={() => setShowCalendar(prev => !prev)} // This toggles the Import Modal
+                  onClick={() => setShowCalendar((prev) => !prev)} // This toggles the Import Modal
                   className="text-brand-green hover:text-brand-green-dark p-1.5 sm:px-3 sm:py-2 rounded-lg hover:bg-brand-green/10 transition-all duration-150 ease-in-out flex items-center text-sm border border-transparent hover:border-brand-green/30"
                   aria-label="Import exercises from previous days"
                >
-                  <svg 
-                     xmlns="http://www.w3.org/2000/svg" 
-                     className="h-5 w-5 sm:mr-1.5" 
-                     fill="none" 
-                     viewBox="0 0 24 24" 
-                     stroke="currentColor" 
+                  <svg
+                     xmlns="http://www.w3.org/2000/svg"
+                     className="h-5 w-5 sm:mr-1.5"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
                      strokeWidth="2"
                   >
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                     <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                     />
                   </svg>
                   <span className="hidden sm:inline">Import</span>
                </button>
@@ -349,11 +381,18 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          {/* Exercise Form */}
          <ExerciseForm
             key={formKey} // Key for resetting the form
-            onSubmit={handleFormSubmit}
+            onSubmit={(name: string, sets: any[]) => {
+               // Convert IFormSet[] to IExerciseSet[] by ensuring notes property exists
+               const exerciseSets: IExerciseSet[] = sets.map((set) => ({
+                  ...set,
+                  notes: set.notes || "", // Add empty string if notes is undefined
+               }));
+               handleFormSubmit(name, exerciseSets);
+            }}
             initialData={editingExercise}
             onCancelEdit={editingExercise ? handleCancelEdit : undefined}
             inputClasses={inputClasses}
-            suggestionSource={suggestionSource} 
+            suggestionSource={suggestionSource}
             maxSets={MAX_SETS} // Pass the MAX_SETS constant
          />
 

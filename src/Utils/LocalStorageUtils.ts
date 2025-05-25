@@ -282,6 +282,9 @@ export const getExercisesLastWeekFormatted = (): string => {
               // Changed '@' to 'x' and added space
               formattedOutput += ` x ${set.weight} kg`;
             }
+            if (set.notes && set.notes.trim() !== "") {
+              formattedOutput += ` (Notes: ${set.notes.trim()})`;
+            }
             formattedOutput += "\n";
           });
           formattedOutput += "\n"; // Add a blank line after each exercise block

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SetInputRow } from "./SetInputRow";
+import { SetInputRow } from "../SetInputRow/SetInputRow"; // Adjusted import path
 
 // --- Types ---
 // Local type for form state (can include string values)
@@ -7,12 +7,14 @@ interface IFormSet {
    id: string;
    reps: string; // Use string for input value
    weight: string; // Use string for input value
+   notes?: string; // Add optional notes field
 }
 // Type from parent (might have number values after validation)
 interface IExerciseSet {
    id: string;
    reps: string | number;
    weight?: string | number;
+   notes?: string; // Add optional notes field
 }
 interface IExerciseEntry {
    // Type for initialData
@@ -43,7 +45,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
    // Use IFormSet for internal state to match input values
    const [exerciseName, setExerciseName] = useState("");
    const [currentSets, setCurrentSets] = useState<IFormSet[]>([
-      { id: Date.now().toString(), reps: "", weight: "" },
+      { id: Date.now().toString(), reps: "", weight: "", notes: "" }, // Add notes to initial set
    ]);
    const nameInputRef = useRef<HTMLInputElement>(null); // Ref for the name input
    const suggestionsListRef = useRef<HTMLUListElement>(null); // Ref for the suggestions UL
@@ -64,6 +66,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   set.weight !== undefined && set.weight !== null
                      ? String(set.weight)
                      : "", // Ensure string or empty string
+               notes: set.notes !== undefined && set.notes !== null ? String(set.notes) : "", // Add notes
             }))
          );
          setError(null);
@@ -72,7 +75,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
          // If initialData is null (not editing), ensure form is reset
          // This might be redundant if the key prop handles it, but safe to include
          setExerciseName("");
-         setCurrentSets([{ id: Date.now().toString(), reps: "", weight: "" }]);
+         setCurrentSets([{ id: Date.now().toString(), reps: "", weight: "", notes: "" }]); // Add notes to reset
          setError(null);
          setSuggestions([]);
       }
@@ -125,7 +128,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
 
    const handleSetChange = (
       id: string,
-      field: "reps" | "weight",
+      field: "reps" | "weight" | "notes", // Add 'notes' to field type
       value: string
    ) => {
       let processedValue = value;
@@ -158,6 +161,9 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
          }
       }
 
+      // For 'notes', we typically don't need much processing unless there's a max length
+      // For now, we'll just take the value as is for notes.
+
       setCurrentSets((prevSets) =>
          prevSets.map((set) =>
             set.id === id ? { ...set, [field]: processedValue } : set
@@ -174,7 +180,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
       }
       setCurrentSets((prevSets) => [
          ...prevSets,
-         { id: Date.now().toString(), reps: "", weight: "" },
+         { id: Date.now().toString(), reps: "", weight: "", notes: "" }, // Add notes to new set
       ]);
    };
 
@@ -232,6 +238,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
             break;
          }
          // Add the set with string values (as they are in the form state)
+         // Notes are optional and don't need specific validation here beyond being a string
          validatedSets.push(set);
       }
 
@@ -314,7 +321,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   // Pass enhanced classes down
                   inputClasses={enhancedInputClasses}
                   isOnlySet={currentSets.length <= 1}
-                  onSetChange={handleSetChange}
+                  onSetChange={handleSetChange} // Ensure this is passed correctly
                   onDeleteSet={handleDeleteSet}
                />
             ))}
