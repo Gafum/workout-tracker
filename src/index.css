@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 #root {
+   --color-brand-green: #10b981;
+   --color-brand-green-dark: #065f46;
    height: 100%;
    --swiper-pagination-bottom: -32px;
    --swiper-pagination-color: #1f2022;
@@ -141,5 +143,49 @@ body {
    .scrollbar-hide {
       -ms-overflow-style: none; /* IE and Edge */
       scrollbar-width: none; /* Firefox */
+   }
+}
+
+/* ... existing code ... */
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+   background-color: #22c55e !important; /* A vibrant green for selected date */
+   color: white !important;
+}
+
+.react-datepicker__day--outside-month {
+   color: #9ca3af; /* Tailwind's gray-400 (unchanged for outside month) */
+}
+
+/* Mobile responsiveness (example, adjust as needed) */
+@media (max-width: 768px) {
+   .react-datepicker-popper {
+      position: absolute !important; /* Use absolute to allow scrolling of content */
+      top: auto !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important; /* Center horizontally */
+      width: 95%; /* Use a slightly larger percentage for better fit */
+      max-width: 320px; /* Adjust max-width for a slightly smaller calendar */
+      bottom: 10px; /* Position at the bottom for better mobile UX */
+   }
+
+   .react-datepicker {
+      width: 100%;
+      font-size: 0.9em; /* Reduce font size for smaller screens */
+   }
+
+   .react-datepicker__header {
+      padding: 0.5em; /* Reduce padding in header */
+   }
+
+   .react-datepicker__navigation {
+      top: 0.7em; /* Adjust navigation button position */
+   }
+
+   .react-datepicker__current-month,
+   .react-datepicker__day-name,
+   .react-datepicker__day {
+      margin: 0.1em; /* Reduce margins for tighter layout */
    }
 }

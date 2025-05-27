@@ -63,7 +63,7 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
   };
 
   const renderDays = () => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return (
       <div className="grid grid-cols-7 mb-2">
         {days.map((day, index) => (
@@ -81,8 +81,8 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
   const renderCells = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Set Monday as the first day
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 }); // Set Monday as the first day
 
     const rows = [];
     let days = [];
