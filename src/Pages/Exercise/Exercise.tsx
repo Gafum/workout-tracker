@@ -12,24 +12,6 @@ import { ImportModal } from "../../Components/ExercisePage/ImportModal";
 // --- Import the new LoggedExerciseList component ---
 import { LoggedExerciseList } from "../../Components/ExercisePage/LoggedExerciseList"; // Added import
 
-// --- Types ---
-// Ensure these are exported
-// REMOVE these type definitions:
-/*
-export interface IExerciseSet {
-   id: string;
-   reps: string | number;
-   weight?: string | number;
-}
-export interface IExerciseEntry {
-   id: string;
-   name: string;
-   sets: IExerciseSet[];
-}
-*/
-// --- End of Types ---
-
-// ADD this import:
 import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 
 interface IExerciseProps {

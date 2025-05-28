@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SetInputRow } from "../SetInputRow/SetInputRow"; // Adjusted import path
+import { SetInputRow } from "./SetInputRow"; // Adjusted import path
 
 // --- Types ---
 // Local type for form state (can include string values)

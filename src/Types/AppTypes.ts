@@ -20,6 +20,7 @@ export interface IExerciseSet {
 }
 
 export interface IExerciseEntry {
+    details: any;
     id: string;
     name: string;
     sets: IExerciseSet[];

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { getAllExerciseNames, getExercisesLastWeekFormatted } from "../../Utils/LocalStorageUtils"; // Import the new function
+import {
+   getAllExerciseNames,
+   getExercisesForDateRangeFormatted,
+} from "../../Utils/LocalStorageUtils"; // Import the new function
 import { EditExerciseModal } from "../../Components/SettingsPage/EditExerciseModal";
 import { DeleteExerciseModal } from "../../Components/SettingsPage/DeleteExerciseModal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export const Settings: React.FC = () => {
    const [exerciseNames, setExerciseNames] = useState<string[]>([]);
@@ -10,6 +15,8 @@ export const Settings: React.FC = () => {
    const [selectedExercise, setSelectedExercise] = useState("");
    const [newExerciseName, setNewExerciseName] = useState("");
    const [copyStatus, setCopyStatus] = useState<string | null>(null); // State for copy status message
+   const [startDate, setStartDate] = useState<Date | null>(null);
+   const [endDate, setEndDate] = useState<Date | null>(null);
 
    useEffect(() => {
       loadExerciseNames();
@@ -44,8 +51,16 @@ export const Settings: React.FC = () => {
    };
 
    // Handler to copy last week's exercises
-   const handleCopyLastWeek = async () => {
-      const formattedData = getExercisesLastWeekFormatted();
+   const handleCopySelectedDates = async () => {
+      if (!startDate || !endDate) {
+         setCopyStatus("Please select both start and end dates.");
+         setTimeout(() => setCopyStatus(null), 3000);
+         return;
+      }
+      const formattedData = getExercisesForDateRangeFormatted(
+         startDate,
+         endDate
+      );
       try {
          await navigator.clipboard.writeText(formattedData);
          setCopyStatus("Copied to clipboard!");
@@ -65,22 +80,68 @@ export const Settings: React.FC = () => {
 
          {/* New section for copying data */}
          <div className="mb-6 border-b border-gray-200 pb-6">
-             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
+            <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
                Data Export
             </h3>
+            <div className="flex flex-col items-start sm:flex-row md:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
+               <div className="flex flex-col">
+                  <label
+                     htmlFor="startDate"
+                     className="text-sm font-medium text-gray-700 mb-1"
+                  >
+                     Start Date:
+                  </label>
+                  <DatePicker
+                     id="startDate"
+                     selected={startDate}
+                     onChange={(date: Date | null) => setStartDate(date)}
+                     selectsStart
+                     startDate={startDate}
+                     endDate={endDate}
+                     className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
+                     dateFormat="yyyy-MM-dd"
+                     placeholderText="Select start date"
+                  />
+               </div>
+               <div className="flex flex-col">
+                  <label
+                     htmlFor="endDate"
+                     className="text-sm font-medium text-gray-700 mb-1"
+                  >
+                     End Date:
+                  </label>
+                  <DatePicker
+                     id="endDate"
+                     selected={endDate}
+                     onChange={(date: Date | null) => setEndDate(date)}
+                     selectsEnd
+                     startDate={startDate}
+                     endDate={endDate}
+                     minDate={startDate || undefined}
+                     className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
+                     dateFormat="yyyy-MM-dd"
+                     placeholderText="Select end date"
+                  />
+               </div>
+            </div>
             <button
-               onClick={handleCopyLastWeek}
+               onClick={handleCopySelectedDates}
                className="px-4 py-2 bg-brand-green text-white font-medium rounded-md shadow-sm hover:bg-brand-green-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green transition duration-150 ease-in-out text-sm"
             >
-               Copy Last Week's Exercises
+               Copy Selected Dates' Exercises
             </button>
             {copyStatus && (
-               <p className={`mt-2 text-sm ${copyStatus.startsWith('Failed') ? 'text-red-600' : 'text-green-600'}`}>
+               <p
+                  className={`mt-2 text-sm ${
+                     copyStatus.startsWith("Failed")
+                        ? "text-red-600"
+                        : "text-green-600"
+                  }`}
+               >
                   {copyStatus}
                </p>
             )}
          </div>
-
 
          <div className="mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
