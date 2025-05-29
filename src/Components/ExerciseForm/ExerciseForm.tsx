@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SetInputRow } from "./SetInputRow"; // Adjusted import path
+import { SetInputRow } from "./SetInputRow";
+import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
+import { WeightUnit } from "../../Types/AppTypes"; // Import WeightUnit
 
 // --- Types ---
 // Local type for form state (can include string values)
@@ -52,6 +54,13 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
 
    const [error, setError] = useState<string | null>(null);
    const [suggestions, setSuggestions] = useState<string[]>([]);
+   const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>("kg");
+
+   // Load unit preferences on component mount
+   useEffect(() => {
+      const preferences = loadUnitPreferences();
+      setCurrentWeightUnit(preferences.weight);
+   }, []);
 
    // Effect to populate form when initialData changes (i.e., editing starts)
    useEffect(() => {
@@ -66,7 +75,10 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   set.weight !== undefined && set.weight !== null
                      ? String(set.weight)
                      : "", // Ensure string or empty string
-               notes: set.notes !== undefined && set.notes !== null ? String(set.notes) : "", // Add notes
+               notes:
+                  set.notes !== undefined && set.notes !== null
+                     ? String(set.notes)
+                     : "", // Add notes
             }))
          );
          setError(null);
@@ -75,7 +87,9 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
          // If initialData is null (not editing), ensure form is reset
          // This might be redundant if the key prop handles it, but safe to include
          setExerciseName("");
-         setCurrentSets([{ id: Date.now().toString(), reps: "", weight: "", notes: "" }]); // Add notes to reset
+         setCurrentSets([
+            { id: Date.now().toString(), reps: "", weight: "", notes: "" },
+         ]); // Add notes to reset
          setError(null);
          setSuggestions([]);
       }
@@ -323,6 +337,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   isOnlySet={currentSets.length <= 1}
                   onSetChange={handleSetChange} // Ensure this is passed correctly
                   onDeleteSet={handleDeleteSet}
+                  currentWeightUnit={currentWeightUnit} // Pass the unit here
                />
             ))}
             {/* Add Set Button - slightly adjusted styles */}

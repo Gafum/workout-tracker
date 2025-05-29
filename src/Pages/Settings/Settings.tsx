@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
    getAllExerciseNames,
    getExercisesForDateRangeFormatted,
-} from "../../Utils/LocalStorageUtils"; // Import the new function
+   saveUnitPreferences, // Import saveUnitPreferences
+   loadUnitPreferences, // Import loadUnitPreferences
+} from "../../Utils/LocalStorageUtils";
 import { EditExerciseModal } from "../../Components/SettingsPage/EditExerciseModal";
 import { DeleteExerciseModal } from "../../Components/SettingsPage/DeleteExerciseModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { IUnitPreferences, WeightUnit, HeightUnit } from "../../Types/AppTypes"; // Import unit types
 
 export const Settings: React.FC = () => {
    const [exerciseNames, setExerciseNames] = useState<string[]>([]);
@@ -17,9 +20,13 @@ export const Settings: React.FC = () => {
    const [copyStatus, setCopyStatus] = useState<string | null>(null); // State for copy status message
    const [startDate, setStartDate] = useState<Date | null>(null);
    const [endDate, setEndDate] = useState<Date | null>(null);
+   const [unitPreferences, setUnitPreferences] = useState<IUnitPreferences>(
+      loadUnitPreferences()
+   );
 
    useEffect(() => {
       loadExerciseNames();
+      setUnitPreferences(loadUnitPreferences()); // Load preferences on mount
    }, []);
 
    const loadExerciseNames = () => {
@@ -62,7 +69,7 @@ export const Settings: React.FC = () => {
          endDate
       );
       try {
-         await navigator.clipboard.writeText(formattedData);
+         await navigator.clipboard.writeText(Array.isArray(formattedData) ? formattedData.join("\n") : formattedData);
          setCopyStatus("Copied to clipboard!");
       } catch (err) {
          console.error("Failed to copy:", err);
@@ -72,11 +79,75 @@ export const Settings: React.FC = () => {
       setTimeout(() => setCopyStatus(null), 3000);
    };
 
+   // Handler to save unit preferences
+   const handleUnitChange = (
+      type: keyof IUnitPreferences,
+      value: WeightUnit | HeightUnit
+   ) => {
+      const newPreferences = { ...unitPreferences, [type]: value };
+      setUnitPreferences(newPreferences);
+      saveUnitPreferences(newPreferences);
+   };
+
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6">
             Settings
          </h2>
+
+         {/* Measurement Units Section */}
+         <div className="mb-6 border-b border-gray-200 pb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
+               Measurement Units
+            </h3>
+            <div className="space-y-4">
+               {/* Weight Unit Selector */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                     Weight Unit
+                  </label>
+                  <div className="flex space-x-2">
+                     {(["kg", "lbs"] as WeightUnit[]).map((unit) => (
+                        <button
+                           key={unit}
+                           onClick={() => handleUnitChange("weight", unit)}
+                           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+                                     ${
+                                        unitPreferences.weight === unit
+                                           ? "bg-brand-green text-white shadow-sm"
+                                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                     }`}
+                        >
+                           {unit.toUpperCase()}
+                        </button>
+                     ))}
+                  </div>
+               </div>
+
+               {/* Height Unit Selector */}
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                     Height Unit
+                  </label>
+                  <div className="flex space-x-2">
+                     {(["cm", "ft/in"] as HeightUnit[]).map((unit) => (
+                        <button
+                           key={unit}
+                           onClick={() => handleUnitChange("height", unit)}
+                           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+                                     ${
+                                        unitPreferences.height === unit
+                                           ? "bg-brand-green text-white shadow-sm"
+                                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                     }`}
+                        >
+                           {unit.toUpperCase()}
+                        </button>
+                     ))}
+                  </div>
+               </div>
+            </div>
+         </div>
 
          {/* New section for copying data */}
          <div className="mb-6 border-b border-gray-200 pb-6">

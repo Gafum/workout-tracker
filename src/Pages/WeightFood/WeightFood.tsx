@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import {
    loadWeightForDay,
    saveWeightForDay,
+   loadUnitPreferences, // Import loadUnitPreferences
 } from "../../Utils/LocalStorageUtils";
-import { IDailyWeight, IFoodEntry } from "../../Types/AppTypes";
+import { IDailyWeight, IFoodEntry, IUnitPreferences } from "../../Types/AppTypes"; // Import IUnitPreferences
 
 interface IWeightFoodProps {
    selectedDate: Date; // Receive selected date from App
@@ -15,9 +16,10 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    const [message, setMessage] = useState<string | null>(null);
    const [foodEntries, setFoodEntries] = useState<IFoodEntry[]>([]);
    const [, setFoodError] = useState<string | null>(null);
+   const [unitPreferences, setUnitPreferences] = useState<IUnitPreferences>(loadUnitPreferences());
 
-   // Load weight data when the selected date changes
    useEffect(() => {
+      setUnitPreferences(loadUnitPreferences()); // Load preferences on mount or when selectedDate changes
       const loadedWeightData = loadWeightForDay(selectedDate);
       
       if (loadedWeightData && (loadedWeightData.morningWeight !== null || loadedWeightData.eveningWeight !== null)) {
@@ -108,7 +110,7 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    return (
       <div className="p-4 bg-white rounded-lg shadow-sm border border-brand-border min-h-[300px]">
          <h2 className="text-xl font-semibold text-brand-green-dark mb-4">
-            Weight Log
+            Weight Log ({unitPreferences.weight.toUpperCase()})
          </h2>
 
          <div className="space-y-4">
@@ -118,7 +120,7 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
                   htmlFor="morningWeight"
                   className="block text-sm font-medium text-gray-700"
                >
-                  Morning Weight (kg/lbs)
+                  Morning Weight ({unitPreferences.weight.toUpperCase()})
                </label>
                <input
                   type="number"
@@ -139,7 +141,7 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
                   htmlFor="eveningWeight"
                   className="block text-sm font-medium text-gray-700"
                >
-                  Evening Weight (kg/lbs)
+                  Evening Weight ({unitPreferences.weight.toUpperCase()})
                </label>
                <input
                   type="number"

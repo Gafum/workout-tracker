@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { IExerciseEntry } from "../../Types/AppTypes";
+import React, { useState, useEffect } from "react"; // Added useEffect
+import { IExerciseEntry, WeightUnit } from "../../Types/AppTypes"; // Added WeightUnit
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
+import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
 
 interface ILoggedExerciseItemProps {
    exercise: IExerciseEntry;
@@ -14,6 +15,13 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    onDelete,
 }) => {
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+   const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>('kg'); // State for weight unit
+
+   // Load unit preferences on component mount
+   useEffect(() => {
+      const preferences = loadUnitPreferences();
+      setCurrentWeightUnit(preferences.weight);
+   }, []);
 
    // Common button classes
    const buttonBaseClasses =
@@ -115,7 +123,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                            </div>
                            {(set.weight || Number(set.weight) !== 0) && (
                               <span className="text-gray-600 text-right sm:text-left sm:ml-3">
-                                 {set.weight + " kg"}
+                                 {set.weight + " " + currentWeightUnit} {/* Display dynamic unit */}
                               </span>
                            )}
                         </div>

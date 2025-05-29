@@ -1,4 +1,5 @@
 import React from "react";
+import { WeightUnit } from "../../Types/AppTypes"; // Import WeightUnit
 
 interface ISetInputRowProps {
    set: {
@@ -16,6 +17,7 @@ interface ISetInputRowProps {
       value: string
    ) => void;
    onDeleteSet: (id: string) => void;
+   currentWeightUnit: WeightUnit; // Add new prop for current weight unit
 }
 
 export const SetInputRow: React.FC<ISetInputRowProps> = ({
@@ -25,6 +27,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
    isOnlySet,
    onSetChange,
    onDeleteSet,
+   currentWeightUnit, // Destructure the new prop
 }) => {
    return (
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:space-x-3 py-3 px-3 rounded-md transition-colors hover:bg-gray-50/50 bg-white shadow-sm border border-gray-200">
@@ -63,7 +66,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                      onSetChange(set.id, "weight", e.target.value)
                   }
                   className={inputClasses}
-                  placeholder="Weight (kg)"
+                  placeholder={`Weight (${currentWeightUnit})`} // Dynamic placeholder
                />
             </div>
 

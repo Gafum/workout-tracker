@@ -2,6 +2,15 @@ import { JSX } from "react";
 
 export type TypeAppMode = 'exercise' | 'weight'; // Or 'weightfood' if you prefer
 
+// Add new unit types and preferences interface
+export type WeightUnit = 'kg' | 'lbs';
+export type HeightUnit = 'cm' | 'ft'; // 'ft' could represent ft/in combined display later
+
+export interface IUnitPreferences {
+  weight: WeightUnit;
+  height: HeightUnit;
+}
+
 export interface IScreen {
     path: string;
     component: JSX.Element;
