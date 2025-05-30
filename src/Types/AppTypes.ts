@@ -46,6 +46,8 @@ export interface IDailyWeight {
     date: string; // Store date as ISO string (YYYY-MM-DD)
     morningWeight?: number | null; // Optional weight in kg/lbs
     eveningWeight?: number | null; // Optional weight in kg/lbs
+    height?: number | null; // Add height
+    age?: number | null; // Add age for BMR
     // Add food entries later if needed
 }
 
@@ -64,9 +66,13 @@ export interface IDailyWeightFood {
     date: string; // YYYY-MM-DD format
     morningWeight: number | null;
     eveningWeight: number | null;
+    height: number | null; // Added height
+    age: number | null; // Added age for BMR calculation
     foodEntries: IFoodEntry[]; // Array to hold multiple food items
 }
 // --- End Modified Daily Data Type ---
+
+export type BmiCategory = 'Underweight' | 'Normal' | 'Overweight' | 'Obese' | 'N/A';
 
 // Calendar Tile Properties (if not already defined elsewhere)
 export interface CalendarTileProperties {

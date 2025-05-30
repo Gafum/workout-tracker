@@ -1,6 +1,6 @@
 import { getItemFromLocalStorage, setItemInLocalStorage } from "./localStorageCore";
 import { getDateKey } from "./dateUtils";
-// import { IDailyWeightFood } from "../Types/AppTypes"; // Assuming this is your type for daily weight/food
+import { IDailyWeightFood } from "../Types/AppTypes"; // Make sure this is imported
 
 // --- Constants for localStorage Keys ---
 const APP_PREFIX = "sport-counter-"; // Prefix for all keys
@@ -16,20 +16,18 @@ const saveAllWeights = (allWeights: Record<string, any>) => {
    return setItemInLocalStorage(WEIGHT_STORAGE_KEY, allWeights);
 };
 
-export const loadWeightForDay = (date: Date): any | null => { 
+export const saveWeightForDay = (date: Date, data: IDailyWeightFood): boolean => { // Ensure 'data' type includes height and age
+   const dateKey = getDateKey(date);
+   const allWeights = loadAllWeights();
+   allWeights[dateKey] = data; // Save the whole object
+   console.log(`Saved weight, height, age, and food data for ${dateKey}:`, data);
+   return saveAllWeights(allWeights);
+};
+
+export const loadWeightForDay = (date: Date): IDailyWeightFood | null => { // Ensure return type includes height and age
    const dateKey = getDateKey(date);
    const allWeights = loadAllWeights();
    return allWeights[dateKey] || null;
 };
-
-export const saveWeightForDay = (date: Date, weightData: any): boolean => { 
-   const dateKey = getDateKey(date);
-   const allWeights = loadAllWeights();
-   allWeights[dateKey] = weightData;
-   console.log(`Saved weight data for ${dateKey}:`, weightData);
-   return saveAllWeights(allWeights);
-};
-
-// You might have other weight/food related functions here, like:
 // export const loadFoodForDay = (date: Date): IFoodEntry[] | null => { ... };
 // export const saveFoodForDay = (date: Date, foodData: IFoodEntry[]): boolean => { ... };

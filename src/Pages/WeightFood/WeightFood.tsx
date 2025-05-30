@@ -1,167 +1,95 @@
-import React, { useState, useEffect } from "react";
-import {
-   loadWeightForDay,
-   saveWeightForDay,
-   loadUnitPreferences, // Import loadUnitPreferences
-} from "../../Utils/LocalStorageUtils";
-import { IDailyWeight, IFoodEntry, IUnitPreferences } from "../../Types/AppTypes"; // Import IUnitPreferences
+import React from "react";
+import { useWeightFood } from "../../Hooks/useWeightFood";
+import { getBmiColor } from "../../Utils/metricDisplayUtils";
 
 interface IWeightFoodProps {
-   selectedDate: Date; // Receive selected date from App
+   selectedDate: Date;
 }
 
 export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
-   const [morningWeight, setMorningWeight] = useState<string | number>("");
-   const [eveningWeight, setEveningWeight] = useState<string | number>("");
-   const [message, setMessage] = useState<string | null>(null);
-   const [foodEntries, setFoodEntries] = useState<IFoodEntry[]>([]);
-   const [, setFoodError] = useState<string | null>(null);
-   const [unitPreferences, setUnitPreferences] = useState<IUnitPreferences>(loadUnitPreferences());
-
-   useEffect(() => {
-      setUnitPreferences(loadUnitPreferences()); // Load preferences on mount or when selectedDate changes
-      const loadedWeightData = loadWeightForDay(selectedDate);
-      
-      if (loadedWeightData && (loadedWeightData.morningWeight !== null || loadedWeightData.eveningWeight !== null)) {
-         // If we have data for the selected date, use it
-         setMorningWeight(loadedWeightData.morningWeight ?? "");
-         setEveningWeight(loadedWeightData.eveningWeight ?? "");
-      } else {
-         // If no data for selected date, try to find most recent data
-         const recentWeight = findMostRecentWeightData();
-         if (recentWeight) {
-            setMorningWeight(recentWeight.morningWeight ?? "");
-            setEveningWeight(recentWeight.eveningWeight ?? "");
-         } else {
-            // No recent data found, use empty values
-            setMorningWeight("");
-            setEveningWeight("");
-         }
-      }
-      
-      setFoodEntries(
-         (loadedWeightData as IDailyWeight & { foodEntries?: IFoodEntry[] })
-            ?.foodEntries ?? []
-      );
-      setMessage(null);
-      setFoodError(null);
-   }, [selectedDate]);
-
-   // Function to find the most recent weight data
-   const findMostRecentWeightData = (): { morningWeight: number | null, eveningWeight: number | null } | null => {
-      // Start from today and go backwards
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setFullYear(today.getFullYear() - 1); // Look back up to 1 year
-      
-      let currentDate = new Date(today);
-      
-      while (currentDate >= startDate) {
-         const data = loadWeightForDay(currentDate);
-         if (data && (data.morningWeight !== null || data.eveningWeight !== null)) {
-            return data;
-         }
-         // Move to previous day
-         currentDate.setDate(currentDate.getDate() - 1);
-      }
-      
-      return null; // No data found in the past year
-   };
-
-   // Function to handle saving data
-   const handleSaveWeight = () => {
-      const morningW = morningWeight === "" ? null : Number(morningWeight);
-      const eveningW = eveningWeight === "" ? null : Number(eveningWeight);
-
-      // Basic validation (optional, can add more specific checks)
-      if (morningWeight !== "" && (isNaN(morningW!) || morningW! <= 0)) {
-         setMessage("Morning weight must be a positive number.");
-         return;
-      }
-      if (eveningWeight !== "" && (isNaN(eveningW!) || eveningW! <= 0)) {
-         setMessage("Evening weight must be a positive number.");
-         return;
-      }
-
-      const weightDataToSave = {
-         morningWeight: morningW,
-         eveningWeight: eveningW,
-         foodEntries: foodEntries, // Include food entries in saved data
-      };
-      saveWeightForDay(selectedDate, weightDataToSave);
-      setMessage("Weight data saved successfully!");
-      // Clear message after a few seconds
-      setTimeout(() => setMessage(null), 3000);
-   };
-
-   // Debounce saving or save on blur/button click
-   // Using onBlur for simplicity here
-   const handleBlur = () => {
-      handleSaveWeight();
-   };
-
-   // Handle adding a food entry
-
-   // Handle deleting a food entry
+   const {
+      morningWeight, setMorningWeight,
+      eveningWeight, setEveningWeight,
+      height, setHeight,
+      age, setAge,
+      bmi, bmiCategory, bmr,
+      message, unitPreferences,
+      handleSaveMetrics,
+   } = useWeightFood(selectedDate);
 
    const inputClasses =
       "mt-1 block w-full px-3 py-2 bg-white border border-brand-border rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green";
+   const cardClasses = "p-4 bg-gray-50 rounded-lg shadow-sm border border-brand-border";
 
    return (
       <div className="p-4 bg-white rounded-lg shadow-sm border border-brand-border min-h-[300px]">
-         <h2 className="text-xl font-semibold text-brand-green-dark mb-4">
-            Weight Log ({unitPreferences.weight.toUpperCase()})
+         <h2 className="text-xl font-semibold text-brand-green-dark mb-6">
+            Daily Metrics & Log
          </h2>
 
-         <div className="space-y-4">
-            {/* Morning Weight Input */}
-            <div>
-               <label
-                  htmlFor="morningWeight"
-                  className="block text-sm font-medium text-gray-700"
-               >
-                  Morning Weight ({unitPreferences.weight.toUpperCase()})
-               </label>
-               <input
-                  type="number"
-                  id="morningWeight"
-                  value={morningWeight}
-                  onChange={(e) => setMorningWeight(e.target.value)}
-                  onBlur={handleBlur} // Save when focus leaves the input
-                  className={inputClasses}
-                  placeholder="e.g., 70.5"
-                  step="0.1" // Allow decimals
-                  min="0"
-               />
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Inputs Column */} 
+            <div className="space-y-4">
+               <div>
+                  <label htmlFor="morningWeight" className="block text-sm font-medium text-gray-700">
+                     Morning Weight ({unitPreferences.weight.toUpperCase()})
+                  </label>
+                  <input type="number" id="morningWeight" value={morningWeight} onChange={(e) => setMorningWeight(e.target.value)} onBlur={handleSaveMetrics} className={inputClasses} placeholder={`e.g., ${unitPreferences.weight === 'kg' ? '70.5' : '155.5'}`} step="0.1" min="0" />
+               </div>
+
+               <div>
+                  <label htmlFor="eveningWeight" className="block text-sm font-medium text-gray-700">
+                     Evening Weight ({unitPreferences.weight.toUpperCase()})
+                  </label>
+                  <input type="number" id="eveningWeight" value={eveningWeight} onChange={(e) => setEveningWeight(e.target.value)} onBlur={handleSaveMetrics} className={inputClasses} placeholder={`e.g., ${unitPreferences.weight === 'kg' ? '71.2' : '157.0'}`} step="0.1" min="0" />
+               </div>
+
+               <div>
+                  <label htmlFor="height" className="block text-sm font-medium text-gray-700">
+                     Height ({unitPreferences.height.toUpperCase()})
+                  </label>
+                  <input type="number" id="height" value={height} onChange={(e) => setHeight(e.target.value)} onBlur={handleSaveMetrics} className={inputClasses} placeholder={`e.g., ${unitPreferences.height === 'cm' ? '175' : '69 (inches)'}`} step="0.1" min="0" />
+                  {unitPreferences.height === 'ft' && <p className="text-xs text-gray-500 mt-1">Enter total height in inches.</p>}
+               </div>
+
+               <div>
+                  <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+                     Age (Years)
+                  </label>
+                  <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} onBlur={handleSaveMetrics} className={inputClasses} placeholder="e.g., 25" min="0" />
+               </div>
             </div>
 
-            {/* Evening Weight Input */}
-            <div>
-               <label
-                  htmlFor="eveningWeight"
-                  className="block text-sm font-medium text-gray-700"
-               >
-                  Evening Weight ({unitPreferences.weight.toUpperCase()})
-               </label>
-               <input
-                  type="number"
-                  id="eveningWeight"
-                  value={eveningWeight}
-                  onChange={(e) => setEveningWeight(e.target.value)}
-                  onBlur={handleBlur} // Save when focus leaves the input
-                  className={inputClasses}
-                  placeholder="e.g., 71.2"
-                  step="0.1"
-                  min="0"
-               />
+            {/* Analytics Column */} 
+            <div className="space-y-4">
+               <div className={cardClasses}>
+                  <h3 className="text-lg font-medium text-brand-green-dark mb-2">BMI</h3>
+                  {bmi !== null ? (
+                     <p className={`text-2xl font-bold ${getBmiColor(bmiCategory)}`}>
+                        {bmi} <span className="text-sm font-normal">({bmiCategory})</span>
+                     </p>
+                  ) : (
+                     <p className="text-gray-500">Enter weight & height.</p>
+                  )}
+               </div>
+
+               <div className={cardClasses}>
+                  <h3 className="text-lg font-medium text-brand-green-dark mb-2">Est. Resting Calories</h3>
+                  {bmr !== null ? (
+                     <p className="text-2xl font-bold text-gray-700">
+                        {bmr} <span className="text-sm font-normal">kcal/day (BMR)</span>
+                     </p>
+                  ) : (
+                     <p className="text-gray-500">Enter weight, height, & age.</p>
+                  )}
+               </div>
             </div>
-
-            {/* Save Confirmation Message */}
-            {message && <p className="text-sm text-green-600">{message}</p>}
-
-            {/* Food Log Section */}
-            {/* <h2>Here Should be the component for Food Section</h2> */}
          </div>
+
+         {message && <p className="text-sm text-green-600 mb-4 text-center">{message}</p>}
+
+         {/* Food Log Section - Placeholder - To be implemented separately */}
+         {/* <div className={cardClasses}> ... </div> */}
       </div>
    );
 };
