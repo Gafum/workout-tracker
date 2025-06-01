@@ -4,11 +4,13 @@ export type TypeAppMode = 'exercise' | 'weight'; // Or 'weightfood' if you prefe
 
 // Add new unit types and preferences interface
 export type WeightUnit = 'kg' | 'lbs';
-export type HeightUnit = 'cm' | 'ft'; // 'ft' could represent ft/in combined display later
+export type HeightUnit = 'cm' | 'ft/in'; // Assuming 'ft/in' for feet/inches combined or just 'ft' if inches are separate
+export type CalendarWeekStart = 'sunday' | 'monday';
 
 export interface IUnitPreferences {
   weight: WeightUnit;
   height: HeightUnit;
+  calendarWeekStart: CalendarWeekStart; // Added new preference
 }
 
 export interface IScreen {

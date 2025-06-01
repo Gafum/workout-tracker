@@ -9,7 +9,7 @@ import { EditExerciseModal } from "../../Components/SettingsPage/EditExerciseMod
 import { DeleteExerciseModal } from "../../Components/SettingsPage/DeleteExerciseModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { IUnitPreferences, WeightUnit, HeightUnit } from "../../Types/AppTypes"; // Import unit types
+import { IUnitPreferences, WeightUnit, HeightUnit, CalendarWeekStart } from "../../Types/AppTypes"; // Import unit types and CalendarWeekStart
 
 export const Settings: React.FC = () => {
    const [exerciseNames, setExerciseNames] = useState<string[]>([]);
@@ -82,11 +82,15 @@ export const Settings: React.FC = () => {
    // Handler to save unit preferences
    const handleUnitChange = (
       type: keyof IUnitPreferences,
-      value: WeightUnit | HeightUnit
+      value: WeightUnit | HeightUnit | CalendarWeekStart // Added CalendarWeekStart
    ) => {
       const newPreferences = { ...unitPreferences, [type]: value };
       setUnitPreferences(newPreferences);
       saveUnitPreferences(newPreferences);
+   };
+
+   const getWeekStartsOn = () => {
+      return unitPreferences.calendarWeekStart === 'monday' ? 1 : 0;
    };
 
    return (
@@ -149,6 +153,28 @@ export const Settings: React.FC = () => {
             </div>
          </div>
 
+         {/* Calendar Week Start Section */}
+         <div className="mb-6 border-b border-gray-200 pb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
+               Calendar Week Start
+            </h3>
+            <div className="flex space-x-2">
+               {(['sunday', 'monday'] as CalendarWeekStart[]).map((day) => (
+                  <button
+                     key={day}
+                     onClick={() => handleUnitChange('calendarWeekStart', day)}
+                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+                               ${unitPreferences.calendarWeekStart === day
+                                  ? 'bg-brand-green text-white shadow-sm'
+                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                               }`}
+                  >
+                     {day.charAt(0).toUpperCase() + day.slice(1)}
+                  </button>
+               ))}
+            </div>
+         </div>
+
          {/* New section for copying data */}
          <div className="mb-6 border-b border-gray-200 pb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
@@ -172,6 +198,7 @@ export const Settings: React.FC = () => {
                      className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
                      dateFormat="yyyy-MM-dd"
                      placeholderText="Select start date"
+                     calendarStartDay={getWeekStartsOn()} // Using correct prop name for react-datepicker
                   />
                </div>
                <div className="flex flex-col">
@@ -192,6 +219,7 @@ export const Settings: React.FC = () => {
                      className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
                      dateFormat="yyyy-MM-dd"
                      placeholderText="Select end date"
+                     calendarStartDay={getWeekStartsOn()} // Using correct prop name for react-datepicker
                   />
                </div>
             </div>

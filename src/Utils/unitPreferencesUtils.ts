@@ -1,29 +1,47 @@
-import { IUnitPreferences } from "../Types/AppTypes";
-import { getItemFromLocalStorage, setItemInLocalStorage } from "./localStorageCore";
+import { IUnitPreferences } from '../Types/AppTypes';
 
-// --- Constants for localStorage Keys ---
-const APP_PREFIX = "sport-counter-"; // Prefix for all keys
-const UNIT_PREFERENCES_KEY = `${APP_PREFIX}unit-preferences`;
+const APP_PREFIX = 'sportCounterApp_';
+const UNIT_PREFERENCES_KEY = `${APP_PREFIX}unitPreferences`;
 
-// --- Unit Preferences --- 
-
-export const saveUnitPreferences = (preferences: IUnitPreferences): boolean => {
-  return setItemInLocalStorage(UNIT_PREFERENCES_KEY, preferences);
+const DEFAULT_PREFERENCES: IUnitPreferences = {
+   weight: 'kg',
+   height: 'cm',
+   calendarWeekStart: 'monday', // Default to Monday
 };
 
 export const loadUnitPreferences = (): IUnitPreferences => {
-  const defaultPreferences: IUnitPreferences = {
-    weight: 'kg',
-    height: 'cm',
-  };
-  const storedPreferences = getItemFromLocalStorage<IUnitPreferences | null>(UNIT_PREFERENCES_KEY, null);
+   try {
+      const storedPreferences = localStorage.getItem(UNIT_PREFERENCES_KEY);
+      if (storedPreferences) {
+         const parsed = JSON.parse(storedPreferences);
+         // Ensure all keys are present, falling back to defaults if not
+         return {
+            weight: parsed.weight || DEFAULT_PREFERENCES.weight,
+            height: parsed.height || DEFAULT_PREFERENCES.height,
+            calendarWeekStart: parsed.calendarWeekStart || DEFAULT_PREFERENCES.calendarWeekStart,
+         };
+      }
+   } catch (error) {
+      console.error("Failed to load unit preferences:", error);
+   }
+   return DEFAULT_PREFERENCES;
+};
 
-  if (storedPreferences && 
-      typeof storedPreferences.weight === 'string' && 
-      typeof storedPreferences.height === 'string' &&
-      ['kg', 'lbs'].includes(storedPreferences.weight) &&
-      ['cm', 'ft'].includes(storedPreferences.height)) {
-    return storedPreferences as IUnitPreferences;
-  }
-  return defaultPreferences;
+export const saveUnitPreferences = (preferences: IUnitPreferences): void => {
+   try {
+      // Basic validation before saving
+      if (!['kg', 'lbs'].includes(preferences.weight)) {
+         throw new Error('Invalid weight unit');
+      }
+      if (!['cm', 'ft/in'].includes(preferences.height)) {
+         throw new Error('Invalid height unit');
+      }
+      if (!['sunday', 'monday'].includes(preferences.calendarWeekStart)) {
+         throw new Error('Invalid calendar week start day');
+      }
+      localStorage.setItem(UNIT_PREFERENCES_KEY, JSON.stringify(preferences));
+   } catch (error) {
+      console.error("Failed to save unit preferences:", error);
+      // Optionally, notify the user or handle the error more gracefully
+   }
 };

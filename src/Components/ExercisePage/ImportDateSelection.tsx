@@ -1,8 +1,9 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import { subDays } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { enGB } from "date-fns/locale";
+import { enGB, enUS } from "date-fns/locale"; // Import locales
+import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Or unitPreferencesUtils.ts
 
 interface IImportDateSelectionProps {
    inputClasses: string;
@@ -17,9 +18,14 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
    importDate,
    onImportDateChange,
    maxDate,
-   defaultDate, // Destructure defaultDate
+   defaultDate,
 }) => {
-   // Removed handleDateInputChange as react-datepicker handles date changes directly
+   const [datepickerLocale, setDatepickerLocale] = useState(enGB); // Default to Monday start
+
+   useEffect(() => {
+      const preferences = loadUnitPreferences();
+      setDatepickerLocale(preferences.calendarWeekStart === 'sunday' ? enUS : enGB);
+   }, []);
 
    const CustomInput = forwardRef(
       (
@@ -78,10 +84,11 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
             dateFormat="yyyy-MM-dd"
             maxDate={new Date(maxDate)} // Convert maxDate string to Date object
             customInput={<CustomInput className={inputClasses} />}
-            locale={enGB} // Set locale to enGB for Monday as first day of week
-            showPopperArrow={false} // Optional: hide the arrow on the popper
-            popperClassName="react-datepicker-popper-custom" // Custom class for popper styling
-            calendarClassName="react-datepicker-calendar-custom" // Custom class for calendar
+            locale={datepickerLocale} // Use state for locale
+            showPopperArrow={false}
+            popperClassName="react-datepicker-popper-custom"
+            calendarClassName="react-datepicker-calendar-custom"
+            popperPlacement="bottom-start"
          />
          <div className="flex flex-wrap gap-2 mt-3">
             {[1, 2, 3, 7, 14].map((days) => (

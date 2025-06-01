@@ -10,7 +10,7 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    const {
       morningWeight, setMorningWeight,
       eveningWeight, setEveningWeight,
-      height, setHeight,
+      heightInput, setHeightInput, // Use heightInput and setHeightInput
       age, setAge,
       bmi, bmiCategory, bmr,
       message, unitPreferences,
@@ -46,10 +46,20 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
 
                <div>
                   <label htmlFor="height" className="block text-sm font-medium text-gray-700">
-                     Height ({unitPreferences.height.toUpperCase()})
+                     Height ({unitPreferences.height === 'ft/in' ? 'IN' : unitPreferences.height.toUpperCase()})
                   </label>
-                  <input type="number" id="height" value={height} onChange={(e) => setHeight(e.target.value)} onBlur={handleSaveMetrics} className={inputClasses} placeholder={`e.g., ${unitPreferences.height === 'cm' ? '175' : '69 (inches)'}`} step="0.1" min="0" />
-                  {unitPreferences.height === 'ft' && <p className="text-xs text-gray-500 mt-1">Enter total height in inches.</p>}
+                  <input 
+                     type="number" 
+                     id="height" 
+                     value={heightInput} // Use heightInput
+                     onChange={(e) => setHeightInput(e.target.value)} // Use setHeightInput
+                     onBlur={handleSaveMetrics} 
+                     className={inputClasses} 
+                     placeholder={`e.g., ${unitPreferences.height === 'cm' ? '175' : '69'}`}
+                     step={unitPreferences.height === 'cm' ? "1" : "0.1"} 
+                     min="0" 
+                  />
+                  {unitPreferences.height === 'ft/in' && <p className="text-xs text-gray-500 mt-1">Enter total height in inches.</p>}
                </div>
 
                <div>

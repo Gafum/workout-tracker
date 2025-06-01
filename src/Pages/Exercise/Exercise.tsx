@@ -87,6 +87,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             id: Date.now().toString(),
             name: name,
             sets: sets,
+            details: null, // Added missing 'details' property
          };
          updatedExercises = [...dailyExercises, newEntry];
          if (
@@ -244,6 +245,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             currentDailyExercises[existingIndex] = {
                ...currentDailyExercises[existingIndex],
                sets: newSets,
+               // Assuming 'details' would be preserved from existing entry or updated if necessary
             };
          } else {
             // Exercise does not exist, add it as a new entry
@@ -254,6 +256,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                   "_imported", // New unique exercise ID
                name: exerciseToImport.name,
                sets: newSets,
+               details: null, // Added missing 'details' property
             });
          }
       });
@@ -293,6 +296,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             currentDailyExercises[existingIndex] = {
                ...currentDailyExercises[existingIndex],
                sets: newSets,
+               // Assuming 'details' would be preserved from existing entry or updated if necessary
             };
          } else {
             // Exercise does not exist, add it
@@ -303,6 +307,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                   "_imported_all", // New exercise ID
                name: exerciseToImport.name,
                sets: newSets,
+               details: null, // Added missing 'details' property
             });
          }
       });
