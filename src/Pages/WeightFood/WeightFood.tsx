@@ -1,6 +1,7 @@
 import React from "react";
 import { useWeightFood } from "../../Hooks/useWeightFood";
 import { getBmiColor } from "../../Utils/metricDisplayUtils";
+import WeightChart from '../../Components/WeightChart/WeightChart';
 
 interface IWeightFoodProps {
    selectedDate: Date;
@@ -10,7 +11,7 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    const {
       morningWeight, setMorningWeight,
       eveningWeight, setEveningWeight,
-      heightInput, setHeightInput, // Use heightInput and setHeightInput
+      heightInput, setHeightInput,
       age, setAge,
       bmi, bmiCategory, bmr,
       message, unitPreferences,
@@ -97,6 +98,14 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
          </div>
 
          {message && <p className="text-sm text-green-600 mb-4 text-center">{message}</p>}
+
+         {/* Add the WeightChart component */}
+         <WeightChart 
+             unitPreferences={unitPreferences}
+             currentMorningWeight={morningWeight?.toString() ?? null}
+             currentEveningWeight={eveningWeight?.toString() ?? null}
+             selectedDate={selectedDate}
+         />
 
          {/* Food Log Section - Placeholder - To be implemented separately */}
          {/* <div className={cardClasses}> ... </div> */}

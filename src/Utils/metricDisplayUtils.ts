@@ -19,3 +19,12 @@ export const getBmiColor = (category: BmiCategory): string => {
       default: return 'text-gray-500';
    }
 };
+
+// Add weight conversion utility
+export const convertWeight = (value: number | null, fromUnit: 'kg' | 'lbs', toUnit: 'kg' | 'lbs'): number | null => {
+    if (value === null) return null;
+    if (fromUnit === toUnit) return value;
+    if (fromUnit === 'kg' && toUnit === 'lbs') return value * 2.20462;
+    if (fromUnit === 'lbs' && toUnit === 'kg') return value / 2.20462;
+    return value;
+};

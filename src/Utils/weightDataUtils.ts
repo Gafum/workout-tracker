@@ -8,7 +8,7 @@ const WEIGHT_STORAGE_KEY = `${APP_PREFIX}weights`;
 
 // --- Weight Data ---
 // Replace 'any' with your actual weight data type e.g. IDailyWeightFood or a specific weight type
-const loadAllWeights = (): Record<string, any> => { 
+export const loadAllWeights = (): Record<string, any> => { 
    return getItemFromLocalStorage(WEIGHT_STORAGE_KEY, {});
 };
 
@@ -29,5 +29,3 @@ export const loadWeightForDay = (date: Date): IDailyWeightFood | null => { // En
    const allWeights = loadAllWeights();
    return allWeights[dateKey] || null;
 };
-// export const loadFoodForDay = (date: Date): IFoodEntry[] | null => { ... };
-// export const saveFoodForDay = (date: Date, foodData: IFoodEntry[]): boolean => { ... };

@@ -35,9 +35,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
 
    // --- useEffect ---
    useEffect(() => {
-      console.log("Selected date:", selectedDate);
       const loadedData = loadExercisesForDay(selectedDate);
-      console.log("Loaded data:", loadedData);
 
       const validatedExercises: IExerciseEntry[] = Array.isArray(loadedData)
          ? loadedData
@@ -54,8 +52,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
               })
               .filter((item): item is IExerciseEntry => item !== null)
          : [];
-
-      console.log("Validated exercises:", validatedExercises);
+         
       setDailyExercises(validatedExercises);
 
       // Fix: Create combinedUniqueNames from POPULAR_EXERCISES and saved exercises

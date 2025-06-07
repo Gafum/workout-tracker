@@ -71,65 +71,60 @@ export const useWeightFood = (selectedDate: Date) => {
       calculateMetrics();
    }, [calculateMetrics]);
 
-   const findMostRecentMetricsData = useCallback((): IDailyWeightFood | null => {
-      // ... (implementation should be fine, ensure it returns height in a consistent base unit if possible)
-      // For now, assume it returns height as it was saved (e.g., in cm or as entered with its unit)
-      // If it returns height in cm, then conversion to display unit is needed.
-      // If it returns height as entered, then unit is also needed from that day's preferences (complex).
-      // Let's assume for now that IDailyWeightFood stores height in a base unit like cm.
-      // OR, that it stores the raw value and we rely on the unit preference of *that day*.
-      // The simplest is to always store height in cm in IDailyWeightFood.height.
-      const today = new Date();
-      let currentDate = new Date(today);
-      const oneYearAgo = new Date(today);
-      oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-      while (currentDate >= oneYearAgo) {
-         const data = loadWeightForDay(currentDate) as IDailyWeightFood | null;
-         // Check if height is explicitly not null or undefined
-         if (data && (data.morningWeight !== undefined || data.eveningWeight !== undefined || data.height !== null && data.height !== undefined)) {
-            return data;
-         }
-         currentDate.setDate(currentDate.getDate() - 1);
-      }
-      return null;
-   }, []);
-
    const loadDataForSelectedDate = useCallback(() => {
-      const loadedData = loadWeightForDay(selectedDate) as IDailyWeightFood | null;
-      const currentPrefs = loadUnitPreferences(); // Load current preferences for display conversion
-      setUnitPreferences(currentPrefs);
-
-      if (loadedData) {
-         setMorningWeight(loadedData.morningWeight ?? "");
-         setEveningWeight(loadedData.eveningWeight ?? "");
-         // Assuming loadedData.height is stored in CM
-         setHeightInput(loadedData.height !== null && loadedData.height !== undefined 
-            ? convertCmToDisplayHeight(loadedData.height, currentPrefs.height) 
-            : "");
-         setAge(loadedData.age ?? "25");
-         setFoodEntries(loadedData.foodEntries ?? []);
-      } else {
-         const recentData = findMostRecentMetricsData();
-         if (recentData) {
-            setMorningWeight(recentData.morningWeight ?? "");
-            setEveningWeight(recentData.eveningWeight ?? "");
-            // Assuming recentData.height is stored in CM
-            setHeightInput(recentData.height !== null && recentData.height !== undefined 
-               ? convertCmToDisplayHeight(recentData.height, currentPrefs.height) 
+       const loadedData = loadWeightForDay(selectedDate) as IDailyWeightFood | null;
+       const currentPrefs = loadUnitPreferences();
+       setUnitPreferences(currentPrefs);
+   
+       if (loadedData) {
+           // Use data from the selected date if it exists
+           setMorningWeight(loadedData.morningWeight ?? "");
+           setEveningWeight(loadedData.eveningWeight ?? "");
+           setHeightInput(loadedData.height !== null && loadedData.height !== undefined 
+               ? convertCmToDisplayHeight(loadedData.height, currentPrefs.height) 
                : "");
-            setAge(recentData.age ?? "25");
-            setFoodEntries([]); 
-         } else {
-            setMorningWeight("");
-            setEveningWeight("");
-            setHeightInput("");
-            setAge("25");
-            setFoodEntries([]);
-         }
-      }
-      setMessage(null);
-   }, [selectedDate, findMostRecentMetricsData]);
+           setAge(loadedData.age ?? "25");
+           setFoodEntries(loadedData.foodEntries ?? []);
+       } else {
+           // If no data exists for selected date, find most recent data before this date
+           let currentDate = new Date(selectedDate);
+           currentDate.setDate(currentDate.getDate() - 1); // Start from the day before
+           
+           while (true) {
+               const previousData = loadWeightForDay(currentDate) as IDailyWeightFood | null;
+               if (previousData && (previousData.morningWeight !== undefined || 
+                   previousData.eveningWeight !== undefined || 
+                   previousData.height !== null && previousData.height !== undefined)) {
+                   // Use the most recent data found
+                   setMorningWeight(previousData.morningWeight ?? "");
+                   setEveningWeight(previousData.eveningWeight ?? "");
+                   setHeightInput(previousData.height !== null && previousData.height !== undefined
+                       ? convertCmToDisplayHeight(previousData.height, currentPrefs.height)
+                       : "");
+                   setAge(previousData.age ?? "25");
+                   setFoodEntries([]); // Clear food entries as they're specific to each day
+                   break;
+               }
+               
+               // Move to previous day
+               currentDate.setDate(currentDate.getDate() - 1);
+               
+               // Stop if we've gone too far back (e.g., one year)
+               const oneYearAgo = new Date(selectedDate);
+               oneYearAgo.setFullYear(selectedDate.getFullYear() - 1);
+               if (currentDate < oneYearAgo) {
+                   // If no data found within a year, set default values
+                   setMorningWeight("");
+                   setEveningWeight("");
+                   setHeightInput("");
+                   setAge("25");
+                   setFoodEntries([]);
+                   break;
+               }
+           }
+       }
+       setMessage(null);
+   }, [selectedDate]);
 
    useEffect(() => {
       loadDataForSelectedDate();
