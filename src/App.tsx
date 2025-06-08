@@ -11,7 +11,6 @@ import './index.css';
 
 // Main App component content, wrapped in AppProvider
 const AppContent = () => {
-    // Use context for managing the active page
     const { activePage, setActivePage } = useAppContext();
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -23,13 +22,9 @@ const AppContent = () => {
 
     // Function to handle mode change from Header (Exercise/Weight)
     const handleModeChange = (mode: TypeAppMode) => {
-        // Map TypeAppMode to AppPage for context
-        if (mode === 'exercise') {
-            setActivePage('exercise');
-        } else if (mode === 'weight') {
-            setActivePage('weight');
+        if (mode === 'exercise' || mode === 'weight') {
+            setActivePage(mode);
         }
-        // Settings page is handled directly by the settings button click
     };
 
     // Function to handle settings button click
