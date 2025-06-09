@@ -1,5 +1,6 @@
 import React from "react";
 import { updateExerciseName } from "../../Utils/LocalStorageUtils";
+import { useLanguage } from "../../Context/LanguageContext";
 
 interface EditExerciseModalProps {
   exercise: string;
@@ -7,6 +8,7 @@ interface EditExerciseModalProps {
   setNewName: (name: string) => void;
   onSave: () => void;
   onCancel: () => void;
+  title?: string; // Optional, will use default if not provided
 }
 
 export const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
@@ -15,7 +17,10 @@ export const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
   setNewName,
   onSave,
   onCancel,
+  title // Use translation as default
 }) => {
+  const { t } = useLanguage();
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newName.trim() === "") {
@@ -30,7 +35,7 @@ export const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 className="text-lg font-semibold text-brand-text mb-4">
-          Edit Exercise Name
+          {title}
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -38,7 +43,7 @@ export const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
               htmlFor="exerciseName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Exercise Name
+              {t('exercise_name')}
             </label>
             <input
               type="text"

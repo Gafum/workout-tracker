@@ -8,6 +8,7 @@ import { AppProvider, useAppContext } from './Context/AppContext'; // Import App
 import { TypeAppMode } from './Types/AppTypes'; // Keep TypeAppMode if still used elsewhere, though context replaces it for navigation
 import { MobileNav } from './Components/MobileNav/MobileNav'; // Import MobileNav
 import './index.css';
+import { LanguageProvider } from './Context/LanguageContext';
 
 // Main App component content, wrapped in AppProvider
 const AppContent = () => {
@@ -77,9 +78,11 @@ const AppContent = () => {
 // Wrap the main AppContent with the AppProvider
 export const App = () => {
     return (
-        <AppProvider>
-            <AppContent />
-        </AppProvider>
+        <LanguageProvider>
+            <AppProvider>
+                <AppContent />
+            </AppProvider>
+        </LanguageProvider>
     );
 };
 

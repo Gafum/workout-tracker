@@ -2,14 +2,20 @@ import React, { useState, useEffect } from "react";
 import {
    getAllExerciseNames,
    getExercisesForDateRangeFormatted,
-   saveUnitPreferences, // Import saveUnitPreferences
-   loadUnitPreferences, // Import loadUnitPreferences
+   saveUnitPreferences,
+   loadUnitPreferences,
 } from "../../Utils/LocalStorageUtils";
 import { EditExerciseModal } from "../../Components/SettingsPage/EditExerciseModal";
 import { DeleteExerciseModal } from "../../Components/SettingsPage/DeleteExerciseModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { IUnitPreferences, WeightUnit, HeightUnit, CalendarWeekStart } from "../../Types/AppTypes"; // Import unit types and CalendarWeekStart
+import {
+   IUnitPreferences,
+   WeightUnit,
+   HeightUnit,
+   CalendarWeekStart,
+} from "../../Types/AppTypes";
+import { useLanguage } from "../../Context/LanguageContext";
 
 export const Settings: React.FC = () => {
    const [exerciseNames, setExerciseNames] = useState<string[]>([]);
@@ -17,16 +23,17 @@ export const Settings: React.FC = () => {
    const [showDeleteModal, setShowDeleteModal] = useState(false);
    const [selectedExercise, setSelectedExercise] = useState("");
    const [newExerciseName, setNewExerciseName] = useState("");
-   const [copyStatus, setCopyStatus] = useState<string | null>(null); // State for copy status message
+   const [copyStatus, setCopyStatus] = useState<string | null>(null);
    const [startDate, setStartDate] = useState<Date | null>(null);
    const [endDate, setEndDate] = useState<Date | null>(null);
    const [unitPreferences, setUnitPreferences] = useState<IUnitPreferences>(
       loadUnitPreferences()
    );
+   const { language: currentLanguage, setLanguage, t } = useLanguage();
 
    useEffect(() => {
       loadExerciseNames();
-      setUnitPreferences(loadUnitPreferences()); // Load preferences on mount
+      setUnitPreferences(loadUnitPreferences());
    }, []);
 
    const loadExerciseNames = () => {
@@ -46,21 +53,18 @@ export const Settings: React.FC = () => {
    };
 
    const handleSaveEdit = () => {
-      // This will be implemented in the EditExerciseModal component
       setShowEditModal(false);
-      loadExerciseNames(); // Refresh the list
+      loadExerciseNames();
    };
 
    const handleConfirmDelete = () => {
-      // This will be implemented in the DeleteExerciseModal component
       setShowDeleteModal(false);
-      loadExerciseNames(); // Refresh the list
+      loadExerciseNames();
    };
 
-   // Handler to copy last week's exercises
    const handleCopySelectedDates = async () => {
       if (!startDate || !endDate) {
-         setCopyStatus("Please select both start and end dates.");
+         setCopyStatus(t("select_date_range")); // Using existing key
          setTimeout(() => setCopyStatus(null), 3000);
          return;
       }
@@ -69,20 +73,22 @@ export const Settings: React.FC = () => {
          endDate
       );
       try {
-         await navigator.clipboard.writeText(Array.isArray(formattedData) ? formattedData.join("\n") : formattedData);
-         setCopyStatus("Copied to clipboard!");
+         await navigator.clipboard.writeText(
+            Array.isArray(formattedData)
+               ? formattedData.join("\n")
+               : formattedData
+         );
+         setCopyStatus(t("copy_success")); // Using new key
       } catch (err) {
          console.error("Failed to copy:", err);
-         setCopyStatus("Failed to copy data.");
+         setCopyStatus(t("copy_error")); // Using new key
       }
-      // Clear status message after a few seconds
       setTimeout(() => setCopyStatus(null), 3000);
    };
 
-   // Handler to save unit preferences
    const handleUnitChange = (
       type: keyof IUnitPreferences,
-      value: WeightUnit | HeightUnit | CalendarWeekStart // Added CalendarWeekStart
+      value: WeightUnit | HeightUnit | CalendarWeekStart
    ) => {
       const newPreferences = { ...unitPreferences, [type]: value };
       setUnitPreferences(newPreferences);
@@ -90,25 +96,24 @@ export const Settings: React.FC = () => {
    };
 
    const getWeekStartsOn = () => {
-      return unitPreferences.calendarWeekStart === 'monday' ? 1 : 0;
+      return unitPreferences.calendarWeekStart === "monday" ? 1 : 0;
    };
 
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6">
-            Settings
+            {t("settings")}
          </h2>
 
-         {/* Measurement Units Section */}
          <div className="mb-6 border-b border-gray-200 pb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
-               Measurement Units
+               {t("units")} {/* Using existing key */}
             </h3>
             <div className="space-y-4">
                {/* Weight Unit Selector */}
                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Weight Unit
+                     {t("weight_unit")}
                   </label>
                   <div className="flex space-x-2">
                      {(["kg", "lbs"] as WeightUnit[]).map((unit) => (
@@ -131,7 +136,7 @@ export const Settings: React.FC = () => {
                {/* Height Unit Selector */}
                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                     Height Unit
+                     {t("height_unit")}
                   </label>
                   <div className="flex space-x-2">
                      {(["cm", "ft/in"] as HeightUnit[]).map((unit) => (
@@ -156,29 +161,32 @@ export const Settings: React.FC = () => {
          {/* Calendar Week Start Section */}
          <div className="mb-6 border-b border-gray-200 pb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
-               Calendar Week Start
+               {t("calendar_start")}
             </h3>
             <div className="flex space-x-2">
-               {(['sunday', 'monday'] as CalendarWeekStart[]).map((day) => (
+               {(["sunday", "monday"] as CalendarWeekStart[]).map((day) => (
                   <button
                      key={day}
-                     onClick={() => handleUnitChange('calendarWeekStart', day)}
+                     onClick={() => handleUnitChange("calendarWeekStart", day)}
                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                               ${unitPreferences.calendarWeekStart === day
-                                  ? 'bg-brand-green text-white shadow-sm'
-                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                               ${
+                                  unitPreferences.calendarWeekStart === day
+                                     ? "bg-brand-green text-white shadow-sm"
+                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                }`}
                   >
-                     {day.charAt(0).toUpperCase() + day.slice(1)}
+                     {t(
+                        day === "sunday" ? "calendar_sunday" : "calendar_monday"
+                     )}{" "}
+                     {/* Using new keys */}
                   </button>
                ))}
             </div>
          </div>
 
-         {/* New section for copying data */}
          <div className="mb-6 border-b border-gray-200 pb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
-               Data Export
+               {t("data_export")}
             </h3>
             <div className="flex flex-col items-start sm:flex-row md:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
                <div className="flex flex-col">
@@ -186,7 +194,7 @@ export const Settings: React.FC = () => {
                      htmlFor="startDate"
                      className="text-sm font-medium text-gray-700 mb-1"
                   >
-                     Start Date:
+                     {t("start_date")}
                   </label>
                   <DatePicker
                      id="startDate"
@@ -197,8 +205,8 @@ export const Settings: React.FC = () => {
                      endDate={endDate}
                      className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
                      dateFormat="yyyy-MM-dd"
-                     placeholderText="Select start date"
-                     calendarStartDay={getWeekStartsOn()} // Using correct prop name for react-datepicker
+                     placeholderText={t("select_start_date")}
+                     calendarStartDay={getWeekStartsOn()}
                   />
                </div>
                <div className="flex flex-col">
@@ -206,7 +214,7 @@ export const Settings: React.FC = () => {
                      htmlFor="endDate"
                      className="text-sm font-medium text-gray-700 mb-1"
                   >
-                     End Date:
+                     {t("end_date")}
                   </label>
                   <DatePicker
                      id="endDate"
@@ -218,8 +226,8 @@ export const Settings: React.FC = () => {
                      minDate={startDate || undefined}
                      className="border border-gray-300 rounded-md p-2 text-sm w-full sm:w-auto"
                      dateFormat="yyyy-MM-dd"
-                     placeholderText="Select end date"
-                     calendarStartDay={getWeekStartsOn()} // Using correct prop name for react-datepicker
+                     placeholderText={t("select_end_date")}
+                     calendarStartDay={getWeekStartsOn()}
                   />
                </div>
             </div>
@@ -227,12 +235,12 @@ export const Settings: React.FC = () => {
                onClick={handleCopySelectedDates}
                className="px-4 py-2 bg-brand-green text-white font-medium rounded-md shadow-sm hover:bg-brand-green-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green transition duration-150 ease-in-out text-sm"
             >
-               Copy Selected Dates' Exercises
+               {t("copy_selected_exercises")}
             </button>
             {copyStatus && (
                <p
                   className={`mt-2 text-sm ${
-                     copyStatus.startsWith("Failed")
+                     copyStatus.startsWith(t("copy_error"))
                         ? "text-red-600"
                         : "text-green-600"
                   }`}
@@ -243,12 +251,28 @@ export const Settings: React.FC = () => {
          </div>
 
          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">{t("language")}</h3>
+            <select
+               value={currentLanguage}
+               onChange={(e) =>
+                  setLanguage(e.target.value as "en" | "uk" | "de" | "ru")
+               }
+               className="w-full p-2 border rounded"
+            >
+               <option value="en">{t("english")}</option>
+               <option value="uk">{t("ukrainian")}</option>
+               <option value="de">{t("german")}</option>
+               <option value="ru">{t("russian")}</option>
+            </select>
+         </div>
+
+         <div className="mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
-               Saved Exercises
+               {t("saved_exercises")}
             </h3>
             {exerciseNames.length === 0 ? (
                <p className="text-center text-gray-500 italic mt-4">
-                  No custom exercises saved yet.
+                  {t("no_saved_exercises")}
                </p>
             ) : (
                <div className="space-y-2">
@@ -257,7 +281,6 @@ export const Settings: React.FC = () => {
                         key={exercise}
                         className="p-3 sm:p-4 border border-gray-200 rounded-lg flex justify-between items-center max-w-[100%] overflow-hidden"
                      >
-                        {/* Added break-words class */}
                         <span className="font-medium text-brand-text break-words text-wrap max-w-[100%] overflow-hidden">
                            {exercise}
                         </span>
@@ -265,7 +288,7 @@ export const Settings: React.FC = () => {
                            <button
                               onClick={() => handleEditClick(exercise)}
                               className="p-1.5 text-gray-600 hover:text-brand-green transition-colors"
-                              aria-label={`Edit ${exercise}`}
+                              aria-label={t("edit_exercise")}
                            >
                               <svg
                                  xmlns="http://www.w3.org/2000/svg"
@@ -285,7 +308,7 @@ export const Settings: React.FC = () => {
                            <button
                               onClick={() => handleDeleteClick(exercise)}
                               className="p-1.5 text-gray-600 hover:text-red-500 transition-colors"
-                              aria-label={`Delete ${exercise}`}
+                              aria-label={t("delete_exercise")}
                            >
                               <svg
                                  xmlns="http://www.w3.org/2000/svg"
@@ -316,6 +339,7 @@ export const Settings: React.FC = () => {
                setNewName={setNewExerciseName}
                onSave={handleSaveEdit}
                onCancel={() => setShowEditModal(false)}
+               title={t('edit_exercise_modal_title')}
             />
          )}
 
@@ -324,6 +348,8 @@ export const Settings: React.FC = () => {
                exercise={selectedExercise}
                onConfirm={handleConfirmDelete}
                onCancel={() => setShowDeleteModal(false)}
+               title={t('delete_exercise_modal_title')}
+               confirmationMessage={t('delete_exercise_confirmation', { exercise: selectedExercise })}
             />
          )}
       </div>
