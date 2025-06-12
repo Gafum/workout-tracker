@@ -11,6 +11,8 @@ import {
 } from "date-fns";
 import CalendarModal from "./CalendarModal";
 import "./CalendarScroll.css";
+import { useLanguage } from "../../Context/LanguageContext";
+import en from "../../locales/en.json";
 
 interface ICalendarScrollProps {
    selectedDate: Date;
@@ -21,6 +23,7 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
    selectedDate,
    onDateChange,
 }) => {
+   const { t } = useLanguage();
    const [showModal, setShowModal] = useState(false);
    const [dates, setDates] = useState<Date[]>([]);
    const scrollRef = useRef<HTMLDivElement>(null);
@@ -95,19 +98,27 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
       setShowModal(!showModal);
    };
 
-   // No changes needed here, isSameDay handles different times correctly
-   // const isSelectedDate = (date: Date) => { ... };
-   // const isToday = (date: Date) => { ... };
+   const getDayShortName = (date: Date): keyof typeof en => {
+      const day = format(date, "EEE").toLowerCase();
+      const mapping: Record<string, keyof typeof en> = {
+         mon: "monday_short",
+         tue: "tuesday_short",
+         wed: "wednesday_short",
+         thu: "thursday_short",
+         fri: "friday_short",
+         sat: "saturday_short",
+         sun: "sunday_short",
+      };
+      return mapping[day];
+   };
 
    return (
       <div className="w-full bg-white rounded-lg p-3 sm:p-4 shadow-sm mb-4">
          <div className="flex items-center justify-between">
-            {/* Previous Button */}
             <button
                onClick={handlePrevious}
-               // Use xs for padding adjustment if needed, otherwise keep sm
                className="text-gray-500 hover:text-brand-green p-1 xs:p-2"
-               aria-label="Previous day"
+               aria-label={t("previous_day")}
             >
                <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -123,15 +134,12 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                </svg>
             </button>
 
-            {/* Date Display for VERY Small Screens (visible below xs, hidden xs and up) */}
             <span className="block xs:hidden text-sm font-medium text-gray-700 mx-2 whitespace-nowrap">
-               {format(startOfDay(selectedDate), "MMMM dd")}
+               {format(startOfDay(selectedDate), t("calendar_date_format"))}
             </span>
 
-            {/* Scrollable Dates (hidden below xs, flex display xs and up) */}
             <div
                ref={scrollRef}
-               // Hidden only below 400px (xs), flex otherwise
                className="hidden xs:flex overflow-x-auto scrollbar-hide space-x-1 sm:space-x-2 py-2 flex-grow mx-1 sm:mx-2"
             >
                {dates.map((date) => {
@@ -157,7 +165,6 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                            !isFutureDate &&
                            handleDateClick(currentDayNormalized)
                         }
-                        // Adjust min-width potentially for xs if needed
                         className={`flex flex-col items-center justify-center min-w-[45px] xs:min-w-[50px] sm:min-w-[60px] py-1 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors duration-300 ease-in-out ${
                            isFutureDate
                               ? "text-gray-300 cursor-not-allowed"
@@ -166,48 +173,42 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                               : "hover:bg-gray-100 cursor-pointer"
                         }`}
                         role="button"
-                        aria-label={`Select date ${format(
-                           currentDayNormalized,
-                           "PPP"
-                        )}`}
+                        aria-label={t("select_date", {
+                           date: format(currentDayNormalized, "PPP"),
+                        })}
                         aria-pressed={isCurrentlySelected}
                      >
-                        {/* Adjust text sizes potentially for xs */}
                         <span className="text-[11px] xs:text-xs sm:text-sm font-medium">
-                           {format(currentDayNormalized, "EEE")}
+                           {t(getDayShortName(currentDayNormalized))}
                         </span>
                         <span className="text-sm xs:text-base sm:text-lg font-bold">
                            {format(date, "d")}
                         </span>
-                        <div className="h-1.5 w-1.5 mt-1 flex items-center justify-center">
-                           {isCurrentToday && (
-                              <div
-                                 className={`h-full w-full ${
-                                    isCurrentlySelected
-                                       ? "bg-white"
-                                       : "bg-brand-green"
-                                 } rounded-full`}
-                              ></div>
-                           )}
-                        </div>
+                        {isCurrentToday && (
+                           <div
+                              className={`h-1.5 w-1.5 mt-1 ${
+                                 isCurrentlySelected
+                                    ? "bg-white"
+                                    : "bg-brand-green"
+                              } rounded-full`}
+                              aria-label={t("today_indicator")}
+                           />
+                        )}
                      </div>
                   );
                })}
             </div>
 
-            {/* Next and Calendar Buttons */}
             <div className="flex items-center">
-               {/* Next Button */}
                <button
                   onClick={handleNext}
                   disabled={isNextDisabled()}
-                  // Add margin-right only below xs, remove it xs and up
                   className={`p-1 xs:p-2 mr-1 xs:mr-0 ${
                      isNextDisabled()
                         ? "text-gray-300 cursor-not-allowed"
                         : "text-gray-500 hover:text-brand-green"
                   }`}
-                  aria-label="Next day"
+                  aria-label={t("next_day")}
                >
                   <svg
                      xmlns="http://www.w3.org/2000/svg"
@@ -223,12 +224,10 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                   </svg>
                </button>
 
-               {/* Calendar Modal Button */}
                <button
                   onClick={toggleModal}
-                  // Use xs for padding adjustment
                   className="text-brand-green hover:text-brand-green-dark p-2"
-                  aria-label="Open calendar view"
+                  aria-label={t("open_calendar")}
                >
                   <svg
                      xmlns="http://www.w3.org/2000/svg"
@@ -248,7 +247,6 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
             </div>
          </div>
 
-         {/* Calendar Modal */}
          {showModal && (
             <CalendarModal
                // Pass normalized selected date to modal

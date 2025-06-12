@@ -14,6 +14,7 @@ import {
    isSameMonth as isSameMonthFn,
 } from "date-fns";
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Or unitPreferencesUtils.ts
+import { useLanguage } from "../../Context/LanguageContext";
 
 interface ICalendarModalProps {
    selectedDate: Date;
@@ -27,6 +28,7 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
    onDateSelect,
    onClose,
 }) => {
+   const { t } = useLanguage();
    const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
    const today = new Date();
    // Option 2: Load preferences internally
@@ -53,6 +55,11 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
       return isSameMonthFn(currentMonth, today);
    };
 
+   const getMonthKey = (date: Date): `month_${number}` => {
+      const monthNumber = format(date, "M");
+      return `month_${Number(monthNumber)}` as `month_${number}`;
+   };
+
    const renderHeader = () => {
       return (
          <div className="flex justify-between items-center mb-4">
@@ -74,7 +81,8 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
                </svg>
             </button>
             <h2 className="text-lg font-bold text-gray-800">
-               {format(currentMonth, "MMMM yyyy")}
+               {t(getMonthKey(currentMonth) as any)}{" "}
+               {format(currentMonth, "yyyy")}
             </h2>
             <button
                onClick={nextMonth}
@@ -106,8 +114,25 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
       // Dynamically generate days based on weekStartsOn
       const dayNames =
          weekStartsOn === 1
-            ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            ? [
+                 t("monday_short"),
+                 t("tuesday_short"),
+                 t("wednesday_short"),
+                 t("thursday_short"),
+                 t("friday_short"),
+                 t("saturday_short"),
+                 t("sunday_short"),
+              ]
+            : [
+                 t("sunday_short"),
+                 t("monday_short"),
+                 t("tuesday_short"),
+                 t("wednesday_short"),
+                 t("thursday_short"),
+                 t("friday_short"),
+                 t("saturday_short"),
+              ];
+
       return (
          <div className="grid grid-cols-7 mb-2">
             {dayNames.map((day, index) => (
@@ -175,11 +200,11 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-               <h2 className="text-xl font-bold text-gray-800">Select Date</h2>
+               <h2 className="text-xl font-bold text-gray-800">{t("select_date_title")}</h2>
                <button
                   onClick={onClose}
                   className="text-gray-500 hover:text-gray-700"
-                  aria-label="Close calendar"
+                  aria-label={t("close_calendar")}
                >
                   <svg
                      xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +230,7 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
                   onClick={onClose}
                   className="px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-brand-green-dark transition-colors"
                >
-                  Close
+                  {t("cancel")}
                </button>
             </div>
          </div>

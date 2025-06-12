@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subMonths, parseISO } from 'date-fns';
+import { de as deLocale, uk as ukLocale, ru as ruLocale } from 'date-fns/locale';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { loadAllWeights } from '../../Utils/weightDataUtils';
 import { convertWeight } from '../../Utils/metricDisplayUtils';
 import { IUnitPreferences } from '../../Types/AppTypes';
+import { useLanguage } from '../../Context/LanguageContext';
 
 interface WeightChartProps {
     unitPreferences: IUnitPreferences;
@@ -16,6 +18,7 @@ interface WeightChartProps {
 
 interface ChartDataPoint {
     date: string;
+    rawDate: Date; // Add this to store the actual date object
     morningWeight: number | null;
     eveningWeight: number | null;
 }
@@ -26,9 +29,20 @@ export const WeightChart: React.FC<WeightChartProps> = ({
     currentEveningWeight, 
     selectedDate 
 }) => {
+    const { t, language } = useLanguage();
     const [startDate, setStartDate] = useState<Date>(subMonths(new Date(), 6));
     const [endDate, setEndDate] = useState<Date>(new Date());
     const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+
+    // Define locale mapping
+    const getLocale = () => {
+        switch (language) {
+            case 'de': return deLocale;
+            case 'uk': return ukLocale;
+            case 'ru': return ruLocale;
+            default: return undefined;
+        }
+    };
 
     useEffect(() => {
         const allWeights = loadAllWeights();
@@ -47,7 +61,8 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     // Only include points that have at least one weight value
                     if (morningW !== null || eveningW !== null) {
                         return {
-                            date: format(date, 'MMM d, yyyy'),
+                            date: format(date, t('calendar_date_format'), { locale: getLocale() }),
+                            rawDate: date, // Store the actual date
                             morningWeight: morningW,
                             eveningWeight: eveningW
                         };
@@ -56,11 +71,11 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                 return null;
             })
             .filter((item): item is ChartDataPoint => item !== null)
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            .sort((a, b) => a.rawDate.getTime() - b.rawDate.getTime());
 
         // Handle current day's data
         if (selectedDate >= startDate && selectedDate <= endDate) {
-            const today = format(selectedDate, 'MMM d, yyyy');
+            const today = format(selectedDate, t('calendar_date_format'), { locale: getLocale() });
             const currentMorningW = currentMorningWeight ? 
                 parseFloat(currentMorningWeight) : null;
             const currentEveningW = currentEveningWeight ? 
@@ -69,22 +84,23 @@ export const WeightChart: React.FC<WeightChartProps> = ({
             // Only add current day if there's at least one weight value
             if (currentMorningW !== null || currentEveningW !== null) {
                 // Remove existing entry for the selected date if it exists
-                data = data.filter(item => item.date !== today);
+                data = data.filter(item => format(item.rawDate, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd'));
                 
                 // Add the current day's data
                 data.push({
                     date: today,
+                    rawDate: selectedDate,
                     morningWeight: currentMorningW,
                     eveningWeight: currentEveningW
                 });
 
                 // Re-sort the data to maintain chronological order
-                data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                data.sort((a, b) => a.rawDate.getTime() - b.rawDate.getTime());
             }
         }
 
         setChartData(data);
-    }, [startDate, endDate, unitPreferences, currentMorningWeight, currentEveningWeight, selectedDate]);
+    }, [startDate, endDate, unitPreferences, currentMorningWeight, currentEveningWeight, selectedDate, t, language]);
 
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
@@ -93,7 +109,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     <p className="text-sm font-medium">{label}</p>
                     {payload.map((entry: any, index: number) => (
                         <p key={index} className="text-sm" style={{ color: entry.color }}>
-                            {entry.name}: {entry.value?.toFixed(1) || 'N/A'} {unitPreferences.weight}
+                            {t(entry.name === 'Morning Weight' ? 'morning_weight_label' : 'evening_weight_label')}: {entry.value?.toFixed(1) || 'N/A'} {unitPreferences.weight}
                         </p>
                     ))}
                 </div>
@@ -104,11 +120,11 @@ export const WeightChart: React.FC<WeightChartProps> = ({
 
     return (
         <div className="mt-6 p-4 bg-white rounded-lg shadow border border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Weight History</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('weight_history')}</h3>
             
             <div className="flex flex-wrap gap-4 mb-4">
                 <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">From:</label>
+                    <label className="text-sm text-gray-600">{t('date_from')}</label>
                     <DatePicker
                         selected={startDate}
                         onChange={(date: Date | null) => date && setStartDate(date)}
@@ -119,7 +135,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">To:</label>
+                    <label className="text-sm text-gray-600">{t('date_to')}</label>
                     <DatePicker
                         selected={endDate}
                         onChange={(date: Date | null) => date && setEndDate(date)}
@@ -140,7 +156,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                             <XAxis dataKey="date" />
                             <YAxis
                                 label={{ 
-                                    value: `Weight (${unitPreferences.weight})`,
+                                    value: t('weight_with_unit', { unit: unitPreferences.weight }),
                                     angle: -90,
                                     position: 'insideLeft'
                                 }}
@@ -150,7 +166,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                             <Line
                                 type="monotone"
                                 dataKey="morningWeight"
-                                name="Morning Weight"
+                                name={t('morning_weight_label')}
                                 stroke="#38A169"
                                 dot={false}
                                 connectNulls
@@ -158,7 +174,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                             <Line
                                 type="monotone"
                                 dataKey="eveningWeight"
-                                name="Evening Weight"
+                                name={t('evening_weight_label')}
                                 stroke="#4C51BF"
                                 dot={false}
                                 connectNulls
@@ -167,7 +183,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     </ResponsiveContainer>
                 ) : (
                     <div className="h-full flex items-center justify-center text-gray-500">
-                        No weight data available for the selected period
+                        {t('no_weight_data')}
                     </div>
                 )}
             </div>
