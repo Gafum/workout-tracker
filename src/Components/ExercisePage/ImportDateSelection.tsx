@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { enGB, enUS } from "date-fns/locale"; // Import locales
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Or unitPreferencesUtils.ts
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface IImportDateSelectionProps {
    inputClasses: string;
@@ -20,6 +21,7 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
    maxDate,
    defaultDate,
 }) => {
+   const { t } = useLanguage(); // Add this line to use translations
    const [datepickerLocale, setDatepickerLocale] = useState(enGB); // Default to Monday start
 
    useEffect(() => {
@@ -71,7 +73,7 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
             htmlFor="import-date-picker"
             className="block text-sm font-medium text-gray-700 mb-1.5"
          >
-            Select Date to Import From:
+            {t("select_date_import")}
          </label>
          <DatePicker
             wrapperClassName="w-full"
@@ -97,7 +99,7 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
                   onClick={() => onImportDateChange(subDays(new Date(), days))}
                   className="px-3 py-1.5 text-xs sm:text-sm bg-gray-100 hover:bg-brand-green/10 text-brand-green-dark border border-gray-200 hover:border-brand-green rounded-md transition-all duration-150 ease-in-out"
                >
-                  {days === 1 ? "Yesterday" : `${days} days ago`}
+                  {days === 1 ? t("yesterday") : t("days_ago", { days })}
                </button>
             ))}
          </div>

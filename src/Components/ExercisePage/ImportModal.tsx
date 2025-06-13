@@ -1,7 +1,8 @@
 import React from "react";
 import { ImportDateSelection } from "./ImportDateSelection";
 import { ImportExerciseList } from "./ImportExerciseList";
-import { IExerciseEntry } from "../../Pages/Exercise/Exercise"; // Adjust path if IExerciseEntry is moved
+import { IExerciseEntry } from "../../Types/AppTypes"; // Updated import path
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface IImportModalProps {
    isOpen: boolean;
@@ -34,6 +35,8 @@ export const ImportModal: React.FC<IImportModalProps> = ({
    onImportAllFromDate,
    formattedImportDate,
 }) => {
+   const { t } = useLanguage(); // Add this line to use translations
+   
    if (!isOpen) return null;
 
    return (
@@ -44,7 +47,7 @@ export const ImportModal: React.FC<IImportModalProps> = ({
          >
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
                <h3 className="text-lg sm:text-xl font-semibold text-brand-green-dark">
-                  Import Exercises
+                  {t("import_exercises")}
                </h3>
                <button
                   onClick={onClose}
@@ -77,7 +80,7 @@ export const ImportModal: React.FC<IImportModalProps> = ({
             )}
             {!importDate && (
                  <div className="flex-grow flex items-center justify-center mb-4 border-t border-gray-200 pt-4">
-                    <p className="text-sm text-gray-500 italic">Please select a date to see available exercises.</p>
+                    <p className="text-sm text-gray-500 italic">{t("please_select_date")}</p>
                  </div>
             )}
 
@@ -86,14 +89,14 @@ export const ImportModal: React.FC<IImportModalProps> = ({
                   onClick={onClose}
                   className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green-light transition-colors"
                >
-                  Cancel
+                  {t("cancel")}
                </button>
                <button
                   onClick={onImportSelected}
                   disabled={selectedToImport.length === 0 || !importDate}
                   className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-brand-green hover:bg-brand-green-dark rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                >
-                  Import Selected ({selectedToImport.length})
+                  {t("import_selected", { count: selectedToImport.length })}
                </button>
             </div>
          </div>

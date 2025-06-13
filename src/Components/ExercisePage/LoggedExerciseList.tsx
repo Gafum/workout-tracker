@@ -1,6 +1,7 @@
 import React from "react";
-import { IExerciseEntry } from "../../Pages/Exercise/Exercise"; // Adjust path if IExerciseEntry is moved
+import { IExerciseEntry } from "../../Types/AppTypes"; // Updated import path
 import { LoggedExerciseItem } from "./LoggedExerciseItem";
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface ILoggedExerciseListProps {
    exercises: IExerciseEntry[];
@@ -15,10 +16,12 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    onDeleteExercise,
    isEditingAnyExercise,
 }) => {
+   const { t } = useLanguage(); // Add this line to use translations
+   
    if (exercises.length === 0 && !isEditingAnyExercise) {
       return (
          <p className="text-center text-gray-500 italic mt-6 sm:mt-8">
-            No exercises logged for this day yet. Add one above!
+            {t("no_exercises_logged")}
          </p>
       );
    }
@@ -30,7 +33,7 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    return (
       <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
          <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-2 sm:mb-3">
-            Logged Exercises
+            {t("logged_exercises")}
          </h3>
          {exercises.map((exercise) => (
             <LoggedExerciseItem

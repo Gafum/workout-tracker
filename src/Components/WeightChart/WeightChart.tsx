@@ -61,7 +61,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     // Only include points that have at least one weight value
                     if (morningW !== null || eveningW !== null) {
                         return {
-                            date: format(date, t('calendar_date_format'), { locale: getLocale() }),
+                            date: format(date, 'dd.MM.yyyy', { locale: getLocale() }),
                             rawDate: date, // Store the actual date
                             morningWeight: morningW,
                             eveningWeight: eveningW
@@ -75,7 +75,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
 
         // Handle current day's data
         if (selectedDate >= startDate && selectedDate <= endDate) {
-            const today = format(selectedDate, t('calendar_date_format'), { locale: getLocale() });
+            const today = format(selectedDate, 'dd.MM.yyyy', { locale: getLocale() });
             const currentMorningW = currentMorningWeight ? 
                 parseFloat(currentMorningWeight) : null;
             const currentEveningW = currentEveningWeight ? 
@@ -109,7 +109,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     <p className="text-sm font-medium">{label}</p>
                     {payload.map((entry: any, index: number) => (
                         <p key={index} className="text-sm" style={{ color: entry.color }}>
-                            {t(entry.name === 'Morning Weight' ? 'morning_weight_label' : 'evening_weight_label')}: {entry.value?.toFixed(1) || 'N/A'} {unitPreferences.weight}
+                            {t(entry.name === 'Morning Weight' ? 'morning_weight' : 'evening_weight')}: {entry.value?.toFixed(1) || 'N/A'} {unitPreferences.weight}
                         </p>
                     ))}
                 </div>
@@ -124,7 +124,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
             
             <div className="flex flex-wrap gap-4 mb-4">
                 <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">{t('date_from')}</label>
+                    <label className="text-sm text-gray-600">{t('from_date')}</label>
                     <DatePicker
                         selected={startDate}
                         onChange={(date: Date | null) => date && setStartDate(date)}
@@ -135,7 +135,7 @@ export const WeightChart: React.FC<WeightChartProps> = ({
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">{t('date_to')}</label>
+                    <label className="text-sm text-gray-600">{t('to_date')}</label>
                     <DatePicker
                         selected={endDate}
                         onChange={(date: Date | null) => date && setEndDate(date)}

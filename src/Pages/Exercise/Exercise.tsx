@@ -11,6 +11,7 @@ import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
 import { ImportModal } from "../../Components/ExercisePage/ImportModal";
 // --- Import the new LoggedExerciseList component ---
 import { LoggedExerciseList } from "../../Components/ExercisePage/LoggedExerciseList"; // Added import
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 
@@ -21,6 +22,7 @@ interface IExerciseProps {
 const MAX_SETS = 10; // Define a reasonable maximum number of sets
 
 export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
+   const { t } = useLanguage(); // Add this line to use translations
    // --- State ---
    const [dailyExercises, setDailyExercises] = useState<IExerciseEntry[]>([]);
    const [suggestionSource, setSuggestionSource] = useState<string[]>([]);
@@ -213,7 +215,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    // Handler for importing selected exercises
    const handleImportSelected = () => {
       if (selectedToImport.length === 0) {
-         alert("Please select at least one exercise to import.");
+         alert(t("select_exercise_error"));
          return;
       }
 
@@ -268,7 +270,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    // Handler for importing all exercises from the selected date
    const handleImportAllFromDate = () => {
       if (importExercises.length === 0) {
-         alert("No exercises to import from the selected date.");
+         alert(t("no_exercises_import_error"));
          return;
       }
 
@@ -328,11 +330,11 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-brand-green-dark mb-5 sm:mb-6 flex flex-wrap justify-between items-center gap-1 sm:gap-2 text-left">
             <span className="flex-shrink min-w-0">
                {editingExercise ? (
-                  `Editing: ${editingExercise.name}`
+                  t("editing_exercise", { name: editingExercise.name })
                ) : (
                   <>
-                     <span className="sm:hidden">Exercise</span>
-                     <span className="hidden sm:inline">{`Log Exercise for ${formattedDate}`}</span>
+                     <span className="sm:hidden">{t("exercise_page_title_short")}</span>
+                     <span className="hidden sm:inline">{t("exercise_page_title", { date: formattedDate })}</span>
                   </>
                )}
             </span>
@@ -341,7 +343,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                <button
                   onClick={() => setShowCalendar((prev) => !prev)} // This toggles the Import Modal
                   className="text-brand-green hover:text-brand-green-dark p-1.5 sm:px-3 sm:py-2 rounded-lg hover:bg-brand-green/10 transition-all duration-150 ease-in-out flex items-center text-sm border border-transparent hover:border-brand-green/30"
-                  aria-label="Import exercises from previous days"
+                  aria-label={t("import")}
                >
                   <svg
                      xmlns="http://www.w3.org/2000/svg"
@@ -357,7 +359,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                      />
                   </svg>
-                  <span className="hidden sm:inline">Import</span>
+                  <span className="hidden sm:inline">{t("import")}</span>
                </button>
             )}
          </h2>

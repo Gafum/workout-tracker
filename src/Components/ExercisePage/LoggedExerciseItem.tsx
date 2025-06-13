@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"; // Added useEffect
 import { IExerciseEntry, WeightUnit } from "../../Types/AppTypes"; // Added WeightUnit
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface ILoggedExerciseItemProps {
    exercise: IExerciseEntry;
@@ -14,6 +15,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    onEdit,
    onDelete,
 }) => {
+   const { t } = useLanguage(); // Add this line to use translations
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
    const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>('kg'); // State for weight unit
 
@@ -34,7 +36,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
       <button
          onClick={() => onEdit(exercise.id)}
          className={editButtonClasses}
-         aria-label={`Edit ${exercise.name}`}
+         aria-label={t("edit", { name: exercise.name })}
       >
          <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +59,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
       <button
          onClick={() => setIsDeleteModalOpen(true)}
          className={deleteButtonClasses}
-         aria-label={`Delete ${exercise.name}`}
+         aria-label={t("delete", { name: exercise.name })}
       >
          <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -115,10 +117,10 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                            <div className="flex justify-between sm:justify-start items-center w-full sm:w-auto mb-1 sm:mb-0">
                               <span className="font-semibold text-brand-text-light mr-2 sm:mr-3">
-                                 Set {index + 1}:
+                                 {t("set")} {index + 1}:
                               </span>
                               <span className="font-medium text-gray-800">
-                                 {set.reps} reps
+                                 {set.reps} {t("reps")}
                               </span>
                            </div>
                            {(set.weight || Number(set.weight) !== 0) && (
@@ -132,7 +134,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                            <div className="mt-1.5 pt-1.5 border-t border-gray-200/80 border-solid">
                               <p className="text-xs text-gray-600 italic break-words">
                                  <span className="font-medium not-italic text-gray-500">
-                                    Notes:{" "}
+                                    {t("notes")}:{" "}
                                  </span>
                                  {set.notes}
                               </p>
@@ -149,6 +151,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                </div>
             </div>
          </div>
+
          <DeleteConfirmationModal
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}

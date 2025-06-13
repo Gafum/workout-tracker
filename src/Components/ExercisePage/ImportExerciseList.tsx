@@ -1,9 +1,6 @@
 import React from "react";
-// REMOVE this import:
-// import { IExerciseEntry } from "../../Pages/Exercise/Exercise"; // Adjust path if IExerciseEntry is moved
-
-// ADD this import:
 import { IExerciseEntry } from "../../Types/AppTypes";
+import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface IImportExerciseListProps {
    importExercises: IExerciseEntry[];
@@ -20,10 +17,12 @@ export const ImportExerciseList: React.FC<IImportExerciseListProps> = ({
    formattedImportDate,
    onImportAllFromDate,
 }) => {
+   const { t } = useLanguage(); // Add this line to use translations
+   
    if (importExercises.length === 0) {
       return (
          <p className="text-sm text-gray-500 italic py-4 text-center">
-            No exercises logged on this date.
+            {t("no_exercises_date")}
          </p>
       );
    }
@@ -32,14 +31,14 @@ export const ImportExerciseList: React.FC<IImportExerciseListProps> = ({
       <>
          <div className="flex flex-wrap justify-between items-center mb-3 gap-2">
             <h4 className="text-md sm:text-lg font-semibold text-brand-text">
-               Available from {formattedImportDate}:
+               {t("available_from", { date: formattedImportDate })}
             </h4>
             {importExercises.length > 0 && (
                <button
                   onClick={onImportAllFromDate}
                   className="px-3 py-1.5 text-xs sm:text-sm bg-gray-100 hover:bg-brand-green/10 text-brand-green-dark border border-gray-200 hover:border-brand-green rounded-md transition-all duration-150 ease-in-out shadow-sm"
                >
-                  Import All ({importExercises.length})
+                  {t("import_all", { count: importExercises.length })}
                </button>
             )}
          </div>
@@ -65,7 +64,7 @@ export const ImportExerciseList: React.FC<IImportExerciseListProps> = ({
                            {exercise.name}
                         </div>
                         <div className={`text-xs sm:text-sm ${isSelected ? 'text-brand-green' : 'text-gray-600'} mt-0.5`}>
-                           {exercise.sets.length} {exercise.sets.length === 1 ? 'set' : 'sets'}
+                           {exercise.sets.length} {exercise.sets.length === 1 ? t("set") : t("sets")}
                         </div>
                      </div>
                      <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all duration-150
