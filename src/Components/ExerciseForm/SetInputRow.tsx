@@ -1,5 +1,8 @@
 import React from "react";
 import { WeightUnit } from "../../Types/AppTypes"; // Import WeightUnit
+import { useLanguage } from "../../Context/LanguageContext";
+
+
 
 interface ISetInputRowProps {
    set: {
@@ -29,6 +32,8 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
    onDeleteSet,
    currentWeightUnit, // Destructure the new prop
 }) => {
+   const { t } = useLanguage();
+   
    return (
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:space-x-3 py-3 px-3 rounded-md transition-colors hover:bg-gray-50/50 bg-white shadow-sm border border-gray-200">
          {/* Inputs */}
@@ -36,7 +41,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
             {/* Reps */}
             <div className="flex-1 min-w-0">
                <label htmlFor={`reps-${set.id}`} className="sr-only">
-                  Reps
+                  {t('reps')}
                </label>
                <input
                   type="text"
@@ -46,7 +51,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                   value={set.reps}
                   onChange={(e) => onSetChange(set.id, "reps", e.target.value)}
                   className={inputClasses}
-                  placeholder="Reps"
+                  placeholder={t('reps')}
                   required
                   maxLength={3}
                />
@@ -55,7 +60,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
             {/* Weight */}
             <div className="flex-1 min-w-0">
                <label htmlFor={`weight-${set.id}`} className="sr-only">
-                  Weight
+                  {t('weight')}
                </label>
                <input
                   type="text"
@@ -66,14 +71,14 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                      onSetChange(set.id, "weight", e.target.value)
                   }
                   className={inputClasses}
-                  placeholder={`Weight (${currentWeightUnit})`} // Dynamic placeholder
+                  placeholder={`${t('weight')} (${currentWeightUnit})`}
                />
             </div>
 
             {/* Notes */}
             <div className="flex-1 min-w-0 sm:flex-grow-[2]">
                <label htmlFor={`notes-${set.id}`} className="sr-only">
-                  Notes
+                  {t('notes')}
                </label>
                <input
                   type="text"
@@ -81,7 +86,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                   value={set.notes ?? ""}
                   onChange={(e) => onSetChange(set.id, "notes", e.target.value)}
                   className={`${inputClasses} w-full`}
-                  placeholder="Notes (e.g., EZ bar, 10s hold)"
+                  placeholder={t('notes_placeholder')} 
                   maxLength={100}
                />
             </div>
@@ -95,7 +100,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                   onClick={() => onDeleteSet(set.id)}
                   className="w-full py-1.5 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition"
                >
-                  Delete set
+                  {t('delete_set')}
                </button>
             </div>
          )}
@@ -106,7 +111,7 @@ export const SetInputRow: React.FC<ISetInputRowProps> = ({
                type="button"
                onClick={() => onDeleteSet(set.id)}
                className="hidden sm:flex p-2.5 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-100 transition"
-               aria-label={`Delete set ${index + 1}`}
+               aria-label={t('delete_set', { index: index + 1 })}
             >
                <svg
                   xmlns="http://www.w3.org/2000/svg"

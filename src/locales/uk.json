@@ -99,7 +99,9 @@
    "logged_exercises": "Записані вправи",
    "no_exercises_logged": "Для цього дня ще не записано жодної вправи. Додайте вправу вище!",
    "exercise_name": "Назва вправи",
+   "exercise_name_label": "Назва вправи",
    "exercise_name_placeholder": "напр., Жим штанги лежачи",
+   "delete_set_aria": "Видалити підхід {{index}}",
    "add_set": "ДОДАТИ ПІДХІД",
    "update_exercise": "Оновити вправу",
    "add_exercise": "Додати вправу",
@@ -120,5 +122,6 @@
    "select_exercise_error": "Будь ласка, виберіть принаймні одну вправу для імпорту.",
    "no_exercises_import_error": "Немає вправ для імпорту з вибраної дати.",
    "from_date": "Від:",
-   "to_date": "До:"
+   "to_date": "До:",
+   "exercise_date_format": "d MMMM yyyy"
 }

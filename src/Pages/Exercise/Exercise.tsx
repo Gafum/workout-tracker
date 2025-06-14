@@ -6,6 +6,7 @@ import {
 } from "../../Utils/LocalStorageUtils";
 import { POPULAR_EXERCISES } from "../../Utils/PopularExercises";
 import { format } from "date-fns";
+import { uk, enUS, de, ru } from "date-fns/locale";
 // --- Import the new components ---
 import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
 import { ImportModal } from "../../Components/ExercisePage/ImportModal";
@@ -22,7 +23,7 @@ interface IExerciseProps {
 const MAX_SETS = 10; // Define a reasonable maximum number of sets
 
 export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
-   const { t } = useLanguage(); // Add this line to use translations
+   const { t, language } = useLanguage(); // Add this line to use translations
    // --- State ---
    const [dailyExercises, setDailyExercises] = useState<IExerciseEntry[]>([]);
    const [suggestionSource, setSuggestionSource] = useState<string[]>([]);
@@ -54,7 +55,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
               })
               .filter((item): item is IExerciseEntry => item !== null)
          : [];
-         
+
       setDailyExercises(validatedExercises);
 
       // Fix: Create combinedUniqueNames from POPULAR_EXERCISES and saved exercises
@@ -317,9 +318,25 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       setShowCalendar(false); // Close modal after import
    };
 
-   const formattedDate = format(selectedDate, "MMMM d, yyyy");
+   const getLocale = () => {
+      switch (language) {
+         case "uk":
+            return uk;
+         case "de":
+            return de;
+         case "ru":
+            return ru;
+         default:
+            return enUS;
+      }
+   };
+
+   const formattedDate = format(selectedDate, t("exercise_date_format"), {
+      locale: getLocale(),
+   });
+
    const formattedImportDate = importDate
-      ? format(importDate, "MMMM d, yyyy")
+      ? format(importDate, t("exercise_date_format"), { locale: getLocale() })
       : "";
    // Calculate max date for the import date picker (today)
    const maxImportDate = format(new Date(), "yyyy-MM-dd");
@@ -333,8 +350,12 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                   t("editing_exercise", { name: editingExercise.name })
                ) : (
                   <>
-                     <span className="sm:hidden">{t("exercise_page_title_short")}</span>
-                     <span className="hidden sm:inline">{t("exercise_page_title", { date: formattedDate })}</span>
+                     <span className="sm:hidden">
+                        {t("exercise_page_title_short")}
+                     </span>
+                     <span className="hidden sm:inline">
+                        {t("exercise_page_title", { date: formattedDate })}
+                     </span>
                   </>
                )}
             </span>

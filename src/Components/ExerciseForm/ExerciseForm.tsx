@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { SetInputRow } from "./SetInputRow";
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
 import { WeightUnit } from "../../Types/AppTypes"; // Import WeightUnit
+import { useLanguage } from "../../Context/LanguageContext";
 
 // --- Types ---
 // Local type for form state (can include string values)
@@ -51,7 +52,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
    ]);
    const nameInputRef = useRef<HTMLInputElement>(null); // Ref for the name input
    const suggestionsListRef = useRef<HTMLUListElement>(null); // Ref for the suggestions UL
-
+   const { t } = useLanguage();
    const [error, setError] = useState<string | null>(null);
    const [suggestions, setSuggestions] = useState<string[]>([]);
    const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>("kg");
@@ -287,7 +288,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                htmlFor="exerciseName"
                className="block text-sm font-medium text-gray-700 mb-1.5"
             >
-               Exercise Name
+               {t("exercise_name_label")}
             </label>
             <input
                type="text"
@@ -297,7 +298,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                ref={nameInputRef} // Add ref to the input
                // Use enhanced classes
                className={enhancedInputClasses}
-               placeholder="e.g., Barbell Bench Press"
+               placeholder={t("exercise_name_placeholder")}
                required
                autoComplete="off"
             />
@@ -325,7 +326,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
          {/* Adjusted spacing */}
          <div className="space-y-3 sm:space-y-4 pt-1">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-               Sets
+               {t("sets")}
             </label>
             {currentSets.map((set, index) => (
                <SetInputRow
@@ -367,7 +368,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   />
                </svg>
                <span className="group-hover:text-gray-700 transition-colors">
-                  ADD SET
+                  {t("add_set")}
                </span>
             </button>
          </div>
@@ -404,8 +405,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                      : "bg-brand-green hover:bg-brand-green-dark focus:ring-brand-green"
                }`}
             >
-               {isEditing ? "Update Exercise" : "Add Exercise"}{" "}
-               {/* Shortened text */}
+               {isEditing ? t("update_exercise") : t("add_exercise")}{" "}
             </button>
 
             {isEditing && onCancelEdit && (
@@ -415,7 +415,7 @@ export const ExerciseForm: React.FC<IExerciseFormProps> = ({
                   // Adjusted padding, text size, consistent styling with submit
                   className="w-full sm:w-auto order-2 sm:order-1 px-6 py-3 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition duration-150 ease-in-out"
                >
-                  Cancel
+                  {t("cancel")}
                </button>
             )}
          </div>
