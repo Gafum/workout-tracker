@@ -79,5 +79,13 @@
    "no_weight_data": "No weight data available for the selected period",
    "exercise_name_label": "Exercise Name",
    "delete_set_aria": "Delete set {{index}}",
-   "exercise_date_format": "MMMM d, yyyy"
+   "exercise_date_format": "MMMM d, yyyy",
+   "weight_food": "Weight/Food",
+   "monday_short": "Mon",
+   "tuesday_short": "Tue",
+   "wednesday_short": "Wed",
+   "thursday_short": "Thu",
+   "friday_short": "Fri",
+   "saturday_short": "Sat",
+   "sunday_short": "Sun"
 }

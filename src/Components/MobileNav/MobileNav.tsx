@@ -1,8 +1,8 @@
 import React from "react";
 import { TypeAppMode } from "../../Types/AppTypes";
-// Import icons
 import { FaWeightHanging, FaDumbbell } from 'react-icons/fa';
-import { useAppContext } from "../../Context/AppContext"; // Import useAppContext
+import { useAppContext } from "../../Context/AppContext";
+import { useLanguage } from "../../Context/LanguageContext"; 
 
 interface IMobileNavProps {
     currentMode: TypeAppMode;
@@ -11,7 +11,8 @@ interface IMobileNavProps {
 }
 
 export const MobileNav: React.FC<IMobileNavProps> = ({ currentMode, onModeChange }) => {
-    const { activePage } = useAppContext(); // Use context to get activePage
+    const { activePage } = useAppContext();
+    const { t } = useLanguage();
 
     const getButtonClasses = (mode: TypeAppMode) => {
         // Adjusted base classes: slightly larger text, more padding
@@ -38,22 +39,18 @@ export const MobileNav: React.FC<IMobileNavProps> = ({ currentMode, onModeChange
             <button
                 onClick={() => onModeChange('weight')}
                 className={getButtonClasses('weight')}
-                aria-current={activePage !== 'settings' && currentMode === 'weight' ? 'page' : undefined} // Accessibility improvement, only mark as current if not on settings page
-                // Removed disabled attribute
+                aria-current={activePage !== 'settings' && currentMode === 'weight' ? 'page' : undefined}
             >
-                {/* Added Icon */}
                 <FaWeightHanging className="w-5 h-5 mb-1" />
-                <span>Weight/Food</span>
+                <span>{t("weight_food")}</span>
             </button>
             <button
                 onClick={() => onModeChange('exercise')}
                 className={getButtonClasses('exercise')}
-                aria-current={activePage !== 'settings' && currentMode === 'exercise' ? 'page' : undefined} // Accessibility improvement, only mark as current if not on settings page
-                // Removed disabled attribute
+                aria-current={activePage !== 'settings' && currentMode === 'exercise' ? 'page' : undefined}
             >
-                 {/* Added Icon */}
                 <FaDumbbell className="w-5 h-5 mb-1" />
-                <span>Exercise</span>
+                <span>{t("exercise")}</span>
             </button>
         </nav>
     );

@@ -6,15 +6,15 @@ import {
 } from "../../Utils/LocalStorageUtils";
 import { POPULAR_EXERCISES } from "../../Utils/PopularExercises";
 import { format } from "date-fns";
-import { uk, enUS, de, ru } from "date-fns/locale";
-// --- Import the new components ---
-import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
-import { ImportModal } from "../../Components/ExercisePage/ImportModal";
+// ...
 // --- Import the new LoggedExerciseList component ---
 import { LoggedExerciseList } from "../../Components/ExercisePage/LoggedExerciseList"; // Added import
 import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
+import { de, enUS, Locale, ru, uk } from "date-fns/locale";
+import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
+import { ImportModal } from "../../Components/ExercisePage/ImportModal";
 
 interface IExerciseProps {
    selectedDate: Date;
@@ -319,17 +319,14 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    };
 
    const getLocale = () => {
-      switch (language) {
-         case "uk":
-            return uk;
-         case "de":
-            return de;
-         case "ru":
-            return ru;
-         default:
-            return enUS;
-      }
-   };
+      const locales: Record<string, Locale> = {
+         uk,
+         de,
+         ru,
+         en: enUS,
+      };
+      return locales[language] || enUS;
+  };
 
    const formattedDate = format(selectedDate, t("exercise_date_format"), {
       locale: getLocale(),

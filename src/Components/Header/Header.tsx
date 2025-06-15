@@ -1,6 +1,7 @@
 import React from "react";
 import { TypeAppMode } from "../../Types/AppTypes";
 import { useAppContext } from "../../Context/AppContext"; 
+import { useLanguage } from "../../Context/LanguageContext"; // Додаємо імпорт
 
 
 interface IHeaderProps {
@@ -17,6 +18,7 @@ export const Header: React.FC<IHeaderProps> = ({
    // Removed isSettingsOpen from props
 }) => {
    const { activePage } = useAppContext(); 
+   const { t } = useLanguage(); // Додаємо використання контексту мови
 
    const getButtonClasses = (mode: TypeAppMode) => {
       // Base classes for all buttons
@@ -63,13 +65,13 @@ export const Header: React.FC<IHeaderProps> = ({
                   onClick={() => onModeChange("weight")}
                   className={getButtonClasses("weight")}
                >
-                  Weight/Food
+                  {t("weight_food")}
                </button>
                <button
                   onClick={() => onModeChange("exercise")}
                   className={getButtonClasses("exercise")}
                >
-                  Exercise
+                  {t("exercise")}
                </button>
             </div>
 

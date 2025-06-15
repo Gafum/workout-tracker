@@ -23,7 +23,7 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
    selectedDate,
    onDateChange,
 }) => {
-   const { t } = useLanguage();
+   const { t, getDateLocale } = useLanguage();
    const [showModal, setShowModal] = useState(false);
    const [dates, setDates] = useState<Date[]>([]);
    const scrollRef = useRef<HTMLDivElement>(null);
@@ -101,13 +101,13 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
    const getDayShortName = (date: Date): keyof typeof en => {
       const day = format(date, "EEE").toLowerCase();
       const mapping: Record<string, keyof typeof en> = {
-         mon: "monday_short",
-         tue: "tuesday_short",
-         wed: "wednesday_short",
-         thu: "thursday_short",
-         fri: "friday_short",
-         sat: "saturday_short",
-         sun: "sunday_short",
+         mon: "monday_short" as keyof typeof en,
+         tue: "tuesday_short" as keyof typeof en,
+         wed: "wednesday_short" as keyof typeof en,
+         thu: "thursday_short" as keyof typeof en,
+         fri: "friday_short" as keyof typeof en,
+         sat: "saturday_short" as keyof typeof en,
+         sun: "sunday_short" as keyof typeof en,
       };
       return mapping[day];
    };
@@ -135,7 +135,14 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
             </button>
 
             <span className="block xs:hidden text-sm font-medium text-gray-700 mx-2 whitespace-nowrap">
-               {format(startOfDay(selectedDate), t("calendar_date_format"))}
+               {selectedDate.toString()}
+               {/* {format(
+                  startOfDay(selectedDate),
+                  t("calendar_date_format" as keyof typeof en),
+                  {
+                     locale: getDateLocale(),
+                  }
+               )} */}
             </span>
 
             <div

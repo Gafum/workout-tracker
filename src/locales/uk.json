@@ -123,5 +123,6 @@
    "no_exercises_import_error": "Немає вправ для імпорту з вибраної дати.",
    "from_date": "Від:",
    "to_date": "До:",
-   "exercise_date_format": "d MMMM yyyy"
+   "exercise_date_format": "d MMMM yyyy",
+   "weight_food": "Вага і Їжа"
 }
