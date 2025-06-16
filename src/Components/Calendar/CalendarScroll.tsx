@@ -135,14 +135,9 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
             </button>
 
             <span className="block xs:hidden text-sm font-medium text-gray-700 mx-2 whitespace-nowrap">
-               {selectedDate.toString()}
-               {/* {format(
-                  startOfDay(selectedDate),
-                  t("calendar_date_format" as keyof typeof en),
-                  {
-                     locale: getDateLocale(),
-                  }
-               )} */}
+               {format(startOfDay(selectedDate), "dd MMMM", {
+                  locale: getDateLocale(),
+               })}
             </span>
 
             <div
