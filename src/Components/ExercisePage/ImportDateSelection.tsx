@@ -21,12 +21,14 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
    maxDate,
    defaultDate,
 }) => {
-   const { t } = useLanguage(); // Add this line to use translations
-   const [datepickerLocale, setDatepickerLocale] = useState(enGB); // Default to Monday start
+   const { t, getDateLocale } = useLanguage();
+   const [_datepickerLocale, setDatepickerLocale] = useState(enGB); // Default to Monday start
 
    useEffect(() => {
       const preferences = loadUnitPreferences();
-      setDatepickerLocale(preferences.calendarWeekStart === 'sunday' ? enUS : enGB);
+      setDatepickerLocale(
+         preferences.calendarWeekStart === "sunday" ? enUS : enGB
+      );
    }, []);
 
    const CustomInput = forwardRef(
@@ -86,7 +88,7 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
             dateFormat="yyyy-MM-dd"
             maxDate={new Date(maxDate)} // Convert maxDate string to Date object
             customInput={<CustomInput className={inputClasses} />}
-            locale={datepickerLocale} // Use state for locale
+            locale={getDateLocale()}
             showPopperArrow={false}
             popperClassName="react-datepicker-popper-custom"
             calendarClassName="react-datepicker-calendar-custom"

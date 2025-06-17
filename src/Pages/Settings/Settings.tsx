@@ -29,7 +29,7 @@ export const Settings: React.FC = () => {
    const [unitPreferences, setUnitPreferences] = useState<IUnitPreferences>(
       loadUnitPreferences()
    );
-   const { language: currentLanguage, setLanguage, t } = useLanguage();
+   const { language: currentLanguage, setLanguage, t, getDateLocale } = useLanguage();
 
    useEffect(() => {
       loadExerciseNames();
@@ -207,6 +207,7 @@ export const Settings: React.FC = () => {
                      dateFormat="yyyy-MM-dd"
                      placeholderText={t("select_start_date")}
                      calendarStartDay={getWeekStartsOn()}
+                     locale={getDateLocale()}
                   />
                </div>
                <div className="flex flex-col">
@@ -228,6 +229,7 @@ export const Settings: React.FC = () => {
                      dateFormat="yyyy-MM-dd"
                      placeholderText={t("select_end_date")}
                      calendarStartDay={getWeekStartsOn()}
+                     locale={getDateLocale()}
                   />
                </div>
             </div>
