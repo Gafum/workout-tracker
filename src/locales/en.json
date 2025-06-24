@@ -60,7 +60,7 @@
    "notes": "Notes",
    "notes_placeholder": "Notes (e.g., EZ bar, 10s hold)",
    "confirm_deletion": "Confirm Deletion",
-   "delete_exercise_confirmation": "Are you sure you want to delete the exercise \"{{name}}\"? This action cannot be undone.",
+   "delete_exercise_confirmation": "Are you sure you want to delete the exercise \"{{exercise}}\"? This action cannot be undone.",
    "max_sets_error": "You can add a maximum of {{max}} sets.",
    "min_sets_error": "You must have at least one set.",
    "empty_name_error": "Exercise name cannot be empty.",

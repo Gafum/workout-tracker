@@ -25,7 +25,7 @@ export const DeleteConfirmationModal: React.FC<
                {t("confirm_deletion")}
             </h3>
             <p className="text-sm text-gray-600 mb-6">
-               {t("delete_exercise_confirmation", { name: exerciseName })}
+               {t("delete_exercise_confirmation", { exercise: exerciseName })}
             </p>
             <div className="flex flex-col sm:flex-row justify-end gap-2">
                <button
