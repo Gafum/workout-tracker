@@ -4,7 +4,6 @@ import {
    saveExercisesForDay,
    getAllExerciseNames,
 } from "../../Utils/LocalStorageUtils";
-import { POPULAR_EXERCISES } from "../../Utils/PopularExercises";
 import { format } from "date-fns";
 // ...
 // --- Import the new LoggedExerciseList component ---
@@ -15,6 +14,7 @@ import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 import { de, enUS, Locale, ru, uk } from "date-fns/locale";
 import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
 import { ImportModal } from "../../Components/ExercisePage/ImportModal";
+import { POPULAR_EXERCISES } from "../../locales/PopularExercises/PopularExercises";
 
 interface IExerciseProps {
    selectedDate: Date;
@@ -57,18 +57,21 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          : [];
 
       setDailyExercises(validatedExercises);
-
       // Fix: Create combinedUniqueNames from POPULAR_EXERCISES and saved exercises
       const savedExerciseNames = getAllExerciseNames();
       const combinedUniqueNames = Array.from(
-         new Set([...POPULAR_EXERCISES, ...savedExerciseNames])
+         new Set([
+            ...(POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
+               []),
+            ...savedExerciseNames,
+         ])
       );
       setSuggestionSource(combinedUniqueNames);
 
       // Reset editing state AND form key when date changes
       setEditingExercise(null);
       setFormKey(`new-${Date.now()}`);
-   }, [selectedDate]);
+   }, [selectedDate, language]);
 
    // --- Handlers ---
    const handleFormSubmit = (name: string, sets: IExerciseSet[]) => {
@@ -326,7 +329,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          en: enUS,
       };
       return locales[language] || enUS;
-  };
+   };
 
    const formattedDate = format(selectedDate, t("exercise_date_format"), {
       locale: getLocale(),
