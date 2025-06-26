@@ -94,12 +94,12 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
             calendarClassName="react-datepicker-calendar-custom"
             popperPlacement="bottom-start"
          />
-         <div className="flex flex-wrap gap-2 mt-3">
+         <div className="flex md:flex-wrap gap-2 mt-3 overflow-scroll md:overflow-hidden pb-2">
             {[1, 2, 3, 7, 14].map((days) => (
                <button
                   key={days}
                   onClick={() => onImportDateChange(subDays(new Date(), days))}
-                  className="px-3 py-1.5 text-xs sm:text-sm bg-gray-100 hover:bg-brand-green/10 text-brand-green-dark border border-gray-200 hover:border-brand-green rounded-md transition-all duration-150 ease-in-out"
+                  className="px-3 py-1.5 text-xs sm:text-sm bg-gray-100 hover:bg-brand-green/10 text-brand-green-dark border border-gray-200 hover:border-brand-green rounded-md transition-all duration-150 ease-in-out whitespace-nowrap break-keep"
                >
                   {days === 1 ? t("yesterday") : t("days_ago", { days })}
                </button>

@@ -36,14 +36,14 @@ export const ImportModal: React.FC<IImportModalProps> = ({
    formattedImportDate,
 }) => {
    const { t } = useLanguage(); // Add this line to use translations
-   
+
    if (!isOpen) return null;
 
    return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
          <div
             ref={calendarRef}
-            className="bg-white rounded-xl shadow-2xl p-4 sm:p-6 max-w-lg w-full flex flex-col max-h-[90vh] sm:max-h-[85vh]"
+            className="bg-white rounded-xl shadow-2xl p-4 sm:p-6 max-w-lg w-full flex flex-col max-h-[90dvh] sm:max-h-[85dvh]"
          >
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
                <h3 className="text-lg sm:text-xl font-semibold text-brand-green-dark">
@@ -54,21 +54,32 @@ export const ImportModal: React.FC<IImportModalProps> = ({
                   className="text-gray-500 hover:text-brand-red p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                   aria-label="Close import modal"
                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                     xmlns="http://www.w3.org/2000/svg"
+                     className="h-5 w-5 sm:h-6 sm:w-6"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     strokeWidth={2.5}
+                  >
+                     <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                     />
                   </svg>
                </button>
             </div>
 
-            <ImportDateSelection
-               inputClasses={inputClasses}
-               importDate={importDate}
-               onImportDateChange={onImportDateChange}
-               maxDate={maxDate}
-            />
+            <div className="w-full flex flex-col sm:overflow-y-hidden overflow-y-scroll overflow-x-hidden">
+               <ImportDateSelection
+                  inputClasses={inputClasses}
+                  importDate={importDate}
+                  onImportDateChange={onImportDateChange}
+                  maxDate={maxDate}
+               />
 
-            {importDate && (
-               <div className="flex-grow overflow-y-auto mb-4 border-t border-gray-200 pt-4 -mx-4 sm:-mx-6 px-4 sm:px-6">
+               {importDate && (
                   <ImportExerciseList
                      importExercises={importExercises}
                      selectedToImport={selectedToImport}
@@ -76,13 +87,15 @@ export const ImportModal: React.FC<IImportModalProps> = ({
                      formattedImportDate={formattedImportDate}
                      onImportAllFromDate={onImportAllFromDate}
                   />
-               </div>
-            )}
-            {!importDate && (
-                 <div className="flex-grow flex items-center justify-center mb-4 border-t border-gray-200 pt-4">
-                    <p className="text-sm text-gray-500 italic">{t("please_select_date")}</p>
-                 </div>
-            )}
+               )}
+               {!importDate && (
+                  <div className="flex-grow flex items-center justify-center mb-4 border-t border-gray-200 pt-4">
+                     <p className="text-sm text-gray-500 italic">
+                        {t("please_select_date")}
+                     </p>
+                  </div>
+               )}
+            </div>
 
             <div className="mt-auto pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                <button
