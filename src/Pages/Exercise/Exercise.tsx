@@ -36,7 +36,14 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    const calendarRef = useRef<HTMLDivElement>(null); // Ref for the import modal
    const [selectedToImport, setSelectedToImport] = useState<string[]>([]);
 
-   // --- useEffect ---
+   useEffect(() => {
+      if (showCalendar) {
+         document.body.style.overflow = "hidden";
+      } else {
+         document.body.style.overflow = "auto";
+      }
+   }, [showCalendar]);
+
    useEffect(() => {
       const loadedData = loadExercisesForDay(selectedDate);
 
