@@ -139,5 +139,6 @@
    "select_exercise_error": "Bitte wählen Sie mindestens eine Übung zum Importieren aus.",
    "no_exercises_import_error": "Keine Übungen zum Importieren vom ausgewählten Datum.",
    "exercise_date_format": "d. MMMM yyyy",
-   "weight_food": "Gewicht/Ernährung"
+   "weight_food": "Gewicht/Ernährung",
+   "drag_to_reorder": "Übung verschieben, um Reihenfolge zu ändern"
 }

@@ -129,6 +129,7 @@
    "edit_exercise": "Edit {{exercise}}",
    "delete_exercise": "Delete {{exercise}}",
    "copy_selected_exercises": "Copy Selected Exercises",
+   "drag_to_reorder": "Drag to reorder exercises",
    "edit_exercise_modal_title": "Edit Exercise",
    "delete_exercise_modal_title": "Delete Exercise"
 }

@@ -4,16 +4,19 @@ import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
 import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
+// Add isDraggable prop to the interface
 interface ILoggedExerciseItemProps {
    exercise: IExerciseEntry;
    onEdit: (id: string) => void;
    onDelete: (id: string) => void;
+   isDraggable?: boolean;
 }
 
 export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    exercise,
    onEdit,
    onDelete,
+   isDraggable = false,
 }) => {
    const { t } = useLanguage(); // Add this line to use translations
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -93,7 +96,14 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
             <div className="flex flex-col">
                {/* TOP ROW: Headline + Desktop Buttons (visible sm and up) */}
                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
-                  <h4 className="text-md sm:text-lg font-semibold text-brand-green-dark break-words mb-2 sm:mb-0 flex-grow">
+                  <h4 className="text-md sm:text-lg font-semibold text-brand-green-dark break-words mb-2 sm:mb-0 flex-grow flex items-center">
+                     {isDraggable && (
+                        <span className="mr-2 text-gray-400 cursor-grab" title={t("drag_to_reorder")}>
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                           </svg>
+                        </span>
+                     )}
                      {exercise.name}
                   </h4>
                   {/* Desktop Buttons Container */}

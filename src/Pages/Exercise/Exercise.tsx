@@ -348,6 +348,12 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
    // Calculate max date for the import date picker (today)
    const maxImportDate = format(new Date(), "yyyy-MM-dd");
 
+   // Add this new handler for reordering exercises
+   const handleReorderExercises = (reorderedExercises: IExerciseEntry[]) => {
+      setDailyExercises(reorderedExercises);
+      saveExercisesForDay(selectedDate, reorderedExercises);
+   };
+
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          {/* Heading */}
@@ -416,6 +422,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             onEditExercise={handleEditExercise}
             onDeleteExercise={handleDeleteExercise}
             isEditingAnyExercise={!!editingExercise}
+            onReorderExercises={handleReorderExercises}
          />
 
          {/* Use the new ImportModal component */}

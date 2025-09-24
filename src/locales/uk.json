@@ -140,5 +140,6 @@
    "delete_exercise": "Видалити {{exercise}}",
    "copy_selected_exercises": "Копіювати вибрані вправи",
    "edit_exercise_modal_title": "Редагувати вправу",
-   "delete_exercise_modal_title": "Видалити вправу"
+   "delete_exercise_modal_title": "Видалити вправу",
+   "drag_to_reorder": "Перетягніть вправу, щоб змінити порядок"
 }

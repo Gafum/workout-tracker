@@ -140,5 +140,6 @@
    "select_exercise_error": "Пожалуйста, выберите хотя бы одно упражнение для импорта.",
    "no_exercises_import_error": "Нет упражнений для импорта с выбранной даты.",
    "exercise_date_format": "d MMMM yyyy",
-   "weight_food": "Вес и Питание"
+   "weight_food": "Вес и Питание",
+   "drag_to_reorder": "Перетяните упражнение, чтобы изменить порядок"
 }
