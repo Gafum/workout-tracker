@@ -1,10 +1,11 @@
 import React, { forwardRef, useState, useEffect } from "react";
-import { subDays } from "date-fns";
+import { subDays, format } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { enGB, enUS } from "date-fns/locale"; // Import locales
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Or unitPreferencesUtils.ts
 import { useLanguage } from "../../Context/LanguageContext"; // Add this import
+import { loadExercisesForDay } from "../../Utils/exerciseDataUtils"; // Import to check for exercises
 
 interface IImportDateSelectionProps {
    inputClasses: string;
@@ -23,12 +24,31 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
 }) => {
    const { t, getDateLocale } = useLanguage();
    const [_datepickerLocale, setDatepickerLocale] = useState(enGB); // Default to Monday start
+   const [daysWithExercises, setDaysWithExercises] = useState<string[]>([]);
+   const today = new Date();
 
    useEffect(() => {
       const preferences = loadUnitPreferences();
       setDatepickerLocale(
          preferences.calendarWeekStart === "sunday" ? enUS : enGB
       );
+   }, []);
+
+   // Load days with exercises for the current month
+   useEffect(() => {
+      // Check for exercises in the last 90 days
+      const checkDays = 90;
+      const daysToCheck: string[] = [];
+
+      for (let i = 0; i < checkDays; i++) {
+         const date = subDays(new Date(), i);
+         const exercises = loadExercisesForDay(date);
+         if (exercises && exercises.length > 0) {
+            daysToCheck.push(format(date, "yyyy-MM-dd"));
+         }
+      }
+
+      setDaysWithExercises(daysToCheck);
    }, []);
 
    const CustomInput = forwardRef(
@@ -69,6 +89,20 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
       )
    );
 
+   // Function to determine day class name
+   const getDayClassName = (date: Date) => {
+      const dateStr = format(date, "yyyy-MM-dd");
+      const isToday = format(today, "yyyy-MM-dd") === dateStr;
+      const hasExercises = daysWithExercises.includes(dateStr);
+
+      if (isToday) {
+         return "react-datepicker__day--today"; // Today's styling is already handled by react-datepicker
+      } else if (hasExercises) {
+         return "day-with-exercises"; // Custom class for days with exercises
+      }
+      return "";
+   };
+
    return (
       <div className="mb-4 w-full">
          <label
@@ -93,6 +127,7 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
             popperClassName="react-datepicker-popper-custom"
             calendarClassName="react-datepicker-calendar-custom"
             popperPlacement="bottom-start"
+            dayClassName={getDayClassName}
          />
          <div className="flex md:flex-wrap gap-2 mt-3 overflow-scroll md:overflow-hidden pb-2">
             {[1, 2, 3, 7, 14].map((days) => (
@@ -105,6 +140,14 @@ export const ImportDateSelection: React.FC<IImportDateSelectionProps> = ({
                </button>
             ))}
          </div>
+
+         <style>{`
+            /* Custom styles for days with exercises */
+            :global(.day-with-exercises) {
+               border: 2px solid #22c55e !important; /* Green border for days with exercises */
+               border-radius: 0.3rem;
+            }
+         `}</style>
       </div>
    );
 };

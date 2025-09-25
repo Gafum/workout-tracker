@@ -146,8 +146,16 @@ body {
    }
 }
 
-/* ... existing code ... */
+/* Add this to the end of your index.css file */
+.day-with-exercises {
+   border: 1px solid #22c55e !important; /* Green border for days with exercises */
+   border-radius: 0.3rem;
+}
 
+/* Make sure today's styling takes precedence */
+.react-datepicker__day--today.day-with-exercises {
+   border: 1px solid #000 !important; /* Black border for today */
+}
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
    background-color: #22c55e !important; /* A vibrant green for selected date */

@@ -118,7 +118,7 @@
    "select_date_range": "Select Date Range",
    "copy_data": "Copy Data",
    "exercise_list": "Exercise List",
-   "no_exercises": "No exercises for this day yet",
+   "has_exercises": "Has exercises logged",
    "data_copied": "Copied to clipboard!",
    "copy_failed": "Copy failed",
    "data_export": "Data Export",

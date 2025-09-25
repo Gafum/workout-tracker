@@ -13,6 +13,7 @@ import CalendarModal from "./CalendarModal";
 import "./CalendarScroll.css";
 import { useLanguage } from "../../Context/LanguageContext";
 import en from "../../locales/en.json";
+import { loadExercisesForDay } from "../../Utils/exerciseDataUtils";
 
 interface ICalendarScrollProps {
    selectedDate: Date;
@@ -26,6 +27,7 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
    const { t, getDateLocale } = useLanguage();
    const [showModal, setShowModal] = useState(false);
    const [dates, setDates] = useState<Date[]>([]);
+   const [daysWithExercises, setDaysWithExercises] = useState<string[]>([]);
    const scrollRef = useRef<HTMLDivElement>(null);
    const today = startOfToday(); // Already the start of today
 
@@ -44,6 +46,24 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
       }
       setDates(dateArray);
    }, [selectedDate]); // Dependency remains selectedDate prop
+
+   // Check for exercises on each date
+   useEffect(() => {
+      const checkExercises = async () => {
+         const exerciseDays: string[] = [];
+         
+         for (const date of dates) {
+            const exercises = loadExercisesForDay(date);
+            if (exercises && exercises.length > 0) {
+               exerciseDays.push(format(date, "yyyy-MM-dd"));
+            }
+         }
+         
+         setDaysWithExercises(exerciseDays);
+      };
+      
+      checkExercises();
+   }, [dates]);
 
    // Scroll to selected date when component mounts or dates change
    useEffect(() => {
@@ -148,6 +168,7 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                   // Normalize date for comparisons to ensure consistency
                   const currentDayNormalized = startOfDay(date);
                   const selectedDayNormalized = startOfDay(selectedDate);
+                  const dateKey = format(currentDayNormalized, "yyyy-MM-dd");
 
                   // Determine if the date is in the future relative to today
                   const isFutureDate = isAfter(currentDayNormalized, today);
@@ -158,6 +179,8 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                   );
                   // Determine if the date is today
                   const isCurrentToday = isSameDay(currentDayNormalized, today);
+                  // Determine if the date has exercises
+                  const hasExercises = daysWithExercises.includes(dateKey);
 
                   return (
                      <div
@@ -186,16 +209,41 @@ export const CalendarScroll: React.FC<ICalendarScrollProps> = ({
                         <span className="text-sm xs:text-base sm:text-lg font-bold">
                            {format(date, "d")}
                         </span>
-                        {isCurrentToday && (
-                           <div
-                              className={`h-1.5 w-1.5 mt-1 ${
-                                 isCurrentlySelected
-                                    ? "bg-white"
-                                    : "bg-brand-green"
-                              } rounded-full`}
-                              aria-label={t("today_indicator")}
-                           />
-                        )}
+                        <div className="flex space-x-1 mt-1">
+                           {isCurrentToday && (
+                              <div
+                                 className={`h-1.5 w-1.5 ${
+                                    isCurrentlySelected
+                                       ? "bg-white"
+                                       : "bg-brand-green"
+                                 } rounded-full`}
+                                 aria-label={t("today_indicator")}
+                                 title={t("today_indicator")}
+                              />
+                           )}
+                           {hasExercises && !isCurrentToday && (
+                              <div
+                                 className={`h-1.5 w-1.5 ${
+                                    isCurrentlySelected
+                                       ? "bg-white"
+                                       : "bg-red-500"
+                                 } rounded-full`}
+                                 aria-label={t("has_exercises")}
+                                 title={t("has_exercises")}
+                              />
+                           )}
+                           {hasExercises && isCurrentToday && (
+                              <div
+                                 className={`h-1.5 w-1.5 ml-1 ${
+                                    isCurrentlySelected
+                                       ? "bg-white"
+                                       : "bg-red-500"
+                                 } rounded-full`}
+                                 aria-label={t("has_exercises")}
+                                 title={t("has_exercises")}
+                              />
+                           )}
+                        </div>
                      </div>
                   );
                })}

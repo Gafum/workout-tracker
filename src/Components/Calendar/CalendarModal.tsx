@@ -15,6 +15,7 @@ import {
 } from "date-fns";
 import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Or unitPreferencesUtils.ts
 import { useLanguage } from "../../Context/LanguageContext";
+import { loadExercisesForDay } from "../../Utils/LocalStorageUtils";
 
 interface ICalendarModalProps {
    selectedDate: Date;
@@ -33,11 +34,33 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
    const today = new Date();
    // Option 2: Load preferences internally
    const [weekStartsOn, setWeekStartsOn] = useState<0 | 1>(1); // 0 for Sunday, 1 for Monday
+   const [daysWithExercises, setDaysWithExercises] = useState<string[]>([]);
 
    useEffect(() => {
       const preferences = loadUnitPreferences();
       setWeekStartsOn(preferences.calendarWeekStart === "sunday" ? 0 : 1);
    }, []);
+
+   // Load days with exercises for the current month view
+   useEffect(() => {
+      const monthStart = startOfMonth(currentMonth);
+      const monthEnd = endOfMonth(monthStart);
+      const startDateOfView = startOfWeek(monthStart, { weekStartsOn });
+      const endDateOfView = endOfWeek(monthEnd, { weekStartsOn });
+
+      const exerciseDays: string[] = [];
+      let day = startDateOfView;
+
+      while (day <= endDateOfView) {
+         const exercises = loadExercisesForDay(day);
+         if (exercises && exercises.length > 0) {
+            exerciseDays.push(format(day, "yyyy-MM-dd"));
+         }
+         day = addDays(day, 1);
+      }
+
+      setDaysWithExercises(exerciseDays);
+   }, [currentMonth, weekStartsOn]);
 
    const prevMonth = () => {
       setCurrentMonth(subMonths(currentMonth, 1));
@@ -162,10 +185,13 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
          for (let i = 0; i < 7; i++) {
             const cloneDay = day;
             const isFutureDate = isAfter(cloneDay, today);
+            const dateKey = format(cloneDay, "yyyy-MM-dd");
+            const hasExercises = daysWithExercises.includes(dateKey);
+
             days.push(
                <div
                   key={day.toString()}
-                  className={`py-3 px-1 text-center ${
+                  className={`py-3 px-1 text-center relative ${
                      !isSameMonth(day, monthStart)
                         ? "text-gray-300"
                         : isSameDay(day, selectedDate)
@@ -182,6 +208,46 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
                   }}
                >
                   <span className="text-sm">{format(day, "d")}</span>
+                  {hasExercises && !isFutureDate && (
+                     <div
+                        className={`absolute bottom-[7px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
+                           isSameDay(day, selectedDate)
+                              ? "bg-red-100"
+                              : "bg-red-500"
+                        }`}
+                        title={t("has_exercises")}
+                     ></div>
+                  )}
+                  {isSameDay(day, today) && !hasExercises && !isFutureDate && (
+                     <div
+                        className={`absolute bottom-[7px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
+                           isSameDay(day, selectedDate)
+                              ? "bg-white"
+                              : "bg-brand-green"
+                        }`}
+                        title={t("today_indicator")}
+                     ></div>
+                  )}
+                  {isSameDay(day, today) && hasExercises && !isFutureDate && (
+                     <div
+                        className={`absolute bottom-[7px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
+                           isSameDay(day, selectedDate)
+                              ? "bg-white"
+                              : "bg-brand-green"
+                        }`}
+                        title={t("today_indicator")}
+                     ></div>
+                  )}
+                  {isSameDay(day, today) && hasExercises && !isFutureDate && (
+                     <div
+                        className={`absolute bottom-[7px] left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
+                           isSameDay(day, selectedDate)
+                              ? "bg-white"
+                              : "bg-brand-green"
+                        }`}
+                        title={t("today_with_exercises" as any)}
+                     ></div>
+                  )}
                </div>
             );
             day = addDays(day, 1);
@@ -200,7 +266,9 @@ export const CalendarModal: React.FC<ICalendarModalProps> = ({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-               <h2 className="text-xl font-bold text-gray-800">{t("select_date_title")}</h2>
+               <h2 className="text-xl font-bold text-gray-800">
+                  {t("select_date_title")}
+               </h2>
                <button
                   onClick={onClose}
                   className="text-gray-500 hover:text-gray-700"
