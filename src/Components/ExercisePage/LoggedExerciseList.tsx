@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { IExerciseEntry } from "../../Types/AppTypes"; // Updated import path
+import React, {  } from "react";
+import { ReactSortable } from "react-sortablejs";
+import { IExerciseEntry } from "../../Types/AppTypes";
+import { useLanguage } from "../../Context/LanguageContext";
 import { LoggedExerciseItem } from "./LoggedExerciseItem";
-import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
 interface ILoggedExerciseListProps {
    exercises: IExerciseEntry[];
    onEditExercise: (id: string) => void;
    onDeleteExercise: (id: string) => void;
-   isEditingAnyExercise: boolean; // To hide "No exercises" message when form is in edit mode
-   onReorderExercises?: (reorderedExercises: IExerciseEntry[]) => void; // New prop for reordering
+   isEditingAnyExercise: boolean;
+   onReorderExercises?: (reorderedExercises: IExerciseEntry[]) => void;
 }
 
 export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
@@ -18,9 +19,8 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    isEditingAnyExercise,
    onReorderExercises,
 }) => {
-   const { t } = useLanguage(); // Add this line to use translations
-   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-   
+   const { t } = useLanguage();
+
    if (exercises.length === 0 && !isEditingAnyExercise) {
       return (
          <p className="text-center text-gray-500 italic mt-6 sm:mt-8">
@@ -30,46 +30,46 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    }
 
    if (exercises.length === 0 && isEditingAnyExercise) {
-      return null; // Don't show "no exercises" if we are editing (form is visible)
+      return null;
    }
 
-   const handleDragStart = (index: number) => {
-      setDraggedIndex(index);
-   };
-
-   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault(); // Allow drop
-   };
-
-   const handleDrop = (index: number) => {
-      if (draggedIndex === null || draggedIndex === index) return;
-      
-      const reorderedExercises = [...exercises];
-      const [draggedExercise] = reorderedExercises.splice(draggedIndex, 1);
-      reorderedExercises.splice(index, 0, draggedExercise);
-      
+   // Функція зворотного виклику для react-sortablejs
+   const handleSetList = (newState: IExerciseEntry[]) => {
       if (onReorderExercises) {
-         onReorderExercises(reorderedExercises);
+         // Перевіряємо, чи дійсно змінився порядок, щоб уникати зайвих рендерів
+         const hasChanged = newState.some((item, index) => item.id !== exercises[index]?.id);
+         if (hasChanged) {
+            onReorderExercises(newState);
+         }
       }
-      
-      setDraggedIndex(null);
    };
 
    return (
-      <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
-         <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-2 sm:mb-3">
+      <div className="mt-6 sm:mt-8">
+         <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3 sm:mb-4">
             {t("logged_exercises")}
          </h3>
-         <div className="space-y-3 sm:space-y-4">
-            {exercises.map((exercise, index) => (
-               <div
-                  key={exercise.id}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={handleDragOver}
-                  onDrop={() => handleDrop(index)}
-                  className={`${draggedIndex === index ? 'opacity-50' : ''}`}
-               >
+
+         {/* 
+            Налаштування SortableJS:
+            - handle: перетягування працює ЛИШЕ за блок з цим класом (рятує скрол на мобільних)
+            - scroll: вмикає автоскрол екрану при піднесенні до країв
+            - ghostClass: напівпрозорий дублікат на місці майбутнього дропу
+         */}
+         <ReactSortable
+            list={exercises}
+            setList={handleSetList}
+            handle=".drag-handle"
+            animation={200}
+            scroll={true}
+            scrollSensitivity={100} // Починає скролити за 100px до краю екрану
+            scrollSpeed={15}        // Швидкість автоскролу (пікселі)
+            ghostClass="opacity-30"
+            chosenClass="shadow-2xl"
+            className="space-y-3 sm:space-y-4"
+         >
+            {exercises.map((exercise) => (
+               <div key={exercise.id}>
                   <LoggedExerciseItem
                      exercise={exercise}
                      onEdit={onEditExercise}
@@ -78,7 +78,7 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
                   />
                </div>
             ))}
-         </div>
+         </ReactSortable>
       </div>
    );
 };

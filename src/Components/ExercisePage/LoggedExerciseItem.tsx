@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"; // Added useEffect
-import { IExerciseEntry, WeightUnit } from "../../Types/AppTypes"; // Added WeightUnit
+import React, { useState, useEffect } from "react";
+import { IExerciseEntry, WeightUnit } from "../../Types/AppTypes";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
-import { loadUnitPreferences } from "../../Utils/LocalStorageUtils"; // Import loadUnitPreferences
-import { useLanguage } from "../../Context/LanguageContext"; // Add this import
+import { loadUnitPreferences } from "../../Utils/LocalStorageUtils";
+import { useLanguage } from "../../Context/LanguageContext";
 
-// Add isDraggable prop to the interface
+
 interface ILoggedExerciseItemProps {
    exercise: IExerciseEntry;
    onEdit: (id: string) => void;
@@ -18,17 +18,15 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    onDelete,
    isDraggable = false,
 }) => {
-   const { t } = useLanguage(); // Add this line to use translations
+   const { t } = useLanguage();
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-   const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>('kg'); // State for weight unit
+   const [currentWeightUnit, setCurrentWeightUnit] = useState<WeightUnit>('kg');
 
-   // Load unit preferences on component mount
    useEffect(() => {
       const preferences = loadUnitPreferences();
       setCurrentWeightUnit(preferences.weight);
    }, []);
 
-   // Common button classes
    const buttonBaseClasses =
       "p-1.5 sm:p-2 rounded-md transition-colors duration-150 ease-in-out";
    const editButtonClasses = `${buttonBaseClasses} text-blue-600 hover:text-blue-800 hover:bg-blue-100`;
@@ -89,23 +87,26 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    return (
       <>
          <div
-            key={exercise.id}
             className="group bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-150 ease-in-out"
          >
-            {/* Main container for content */}
             <div className="flex flex-col">
-               {/* TOP ROW: Headline + Desktop Buttons (visible sm and up) */}
+               {/* TOP ROW: Headline + Desktop Buttons */}
                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                   <h4 className="text-md sm:text-lg font-semibold text-brand-green-dark break-words mb-2 sm:mb-0 flex-grow flex items-center">
                      {isDraggable && (
-                        <span className="mr-2 text-gray-400 cursor-grab" title={t("drag_to_reorder")}>
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        /* Додано клас drag-handle — тепер це єдина зона для тачу/ініціації сортування */
+                        <span
+                           className="drag-handle mr-3 text-gray-400 cursor-grab active:cursor-grabbing p-2 -ml-2 rounded-md hover:bg-gray-100 touch-none flex items-center justify-center"
+                           title={t("drag_to_reorder")}
+                        >
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                            </svg>
                         </span>
                      )}
-                     {exercise.name}
+                     <span className="flex-grow">{exercise.name}</span>
                   </h4>
+
                   {/* Desktop Buttons Container */}
                   <div
                      className="hidden sm:flex items-center self-end sm:self-start space-x-2 sm:space-x-3 flex-shrink-0 
@@ -117,7 +118,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                   </div>
                </div>
 
-               {/* Sets display - remains below the headline and buttons */}
+               {/* Sets display */}
                <div className="text-xs sm:text-sm text-gray-700 space-y-2">
                   {exercise.sets.map((set, index) => (
                      <div
@@ -135,11 +136,10 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                            </div>
                            {(set.weight || Number(set.weight) !== 0) && (
                               <span className="text-gray-600 text-right sm:text-left sm:ml-3">
-                                 {set.weight + " " + currentWeightUnit} {/* Display dynamic unit */}
+                                 {set.weight + " " + currentWeightUnit}
                               </span>
                            )}
                         </div>
-                        {/* Display Notes if they exist */}
                         {set.notes && (
                            <div className="mt-1.5 pt-1.5 border-t border-gray-200/80 border-solid">
                               <p className="text-xs text-gray-600 italic break-words">
@@ -154,7 +154,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                   ))}
                </div>
 
-               {/* MOBILE BUTTONS (visible on mobile, hidden sm and up, at the very bottom) */}
+               {/* MOBILE BUTTONS */}
                <div className="flex sm:hidden items-center justify-center space-x-3 mt-4">
                   <EditButton />
                   <DeleteButton />
