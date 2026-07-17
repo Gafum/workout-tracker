@@ -10,6 +10,7 @@ interface ILoggedExerciseItemProps {
    onEdit: (id: string) => void;
    onDelete: (id: string) => void;
    isDraggable?: boolean;
+   dragHandleProps?: any;
 }
 
 export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
@@ -17,6 +18,7 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    onEdit,
    onDelete,
    isDraggable = false,
+   dragHandleProps
 }) => {
    const { t } = useLanguage();
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -94,10 +96,10 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                   <h4 className="text-md sm:text-lg font-semibold text-brand-green-dark break-words mb-2 sm:mb-0 flex-grow flex items-center">
                      {isDraggable && (
-                        /* Додано клас drag-handle — тепер це єдина зона для тачу/ініціації сортування */
                         <span
                            className="drag-handle mr-3 text-gray-400 cursor-grab active:cursor-grabbing p-2 -ml-2 rounded-md hover:bg-gray-100 touch-none flex items-center justify-center"
                            title={t("drag_to_reorder")}
+                           {...dragHandleProps}
                         >
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />

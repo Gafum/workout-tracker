@@ -38,7 +38,6 @@ export const saveExercisesForDay = (
    allExercises[dateKey] = exercises;
    if (saveAllExercises(allExercises)) {
       updateExerciseNamesList(exercises); // Update names only if save was successful
-      console.log(`Saved exercises for ${dateKey}:`, exercises);
       return true;
    }
    return false;
