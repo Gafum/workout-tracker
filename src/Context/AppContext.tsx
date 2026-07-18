@@ -1,11 +1,29 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo } from 'react';
+import {
+  getAllWorkoutPlans,
+  loadActivePlanDayIndex,
+  loadActivePlanId,
+  loadSavedCustomPlans,
+  saveActivePlanDayIndex,
+  saveActivePlanId,
+  saveCustomPlans,
+} from '../Utils/planUtils';
+import { IWorkoutPlan } from '../Types/plan';
 
-type AppPage = 'exercise' | 'weight' | 'settings';
+type AppPage = 'exercise' | 'weight' | 'settings' | 'plans';
 
 interface AppContextType {
   activePage: AppPage;
   setActivePage: (page: AppPage) => void;
   previousPage: AppPage | null;
+  activePlanId: string | null;
+  setActivePlanId: (planId: string | null) => void;
+  activePlanDayIndex: number;
+  setActivePlanDayIndex: (dayIndex: number) => void;
+  customPlans: IWorkoutPlan[];
+  saveCustomPlans: (plans: IWorkoutPlan[]) => void;
+  activePlan?: IWorkoutPlan;
+  allPlans: IWorkoutPlan[];
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -13,7 +31,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 // Helper function to get initial page from URL hash
 const getInitialPage = (): AppPage => {
   const hash = window.location.hash.replace('#', '');
-  if (hash === 'exercise' || hash === 'weight' || hash === 'settings') {
+  if (hash === 'exercise' || hash === 'weight' || hash === 'settings' || hash === 'plans') {
     return hash;
   }
   return 'exercise'; // Default page
@@ -22,11 +40,32 @@ const getInitialPage = (): AppPage => {
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activePage, setActivePage] = useState<AppPage>(getInitialPage());
   const [previousPage, setPreviousPage] = useState<AppPage | null>(null);
+  const [activePlanId, setActivePlanId] = useState<string | null>(loadActivePlanId());
+  const [activePlanDayIndex, setActivePlanDayIndex] = useState<number>(loadActivePlanDayIndex());
+  const [customPlans, setCustomPlansState] = useState<IWorkoutPlan[]>(loadSavedCustomPlans());
+
+  const allPlans = useMemo(() => getAllWorkoutPlans(), [customPlans]);
+  const activePlan = useMemo(
+    () => allPlans.find((plan) => plan.id === activePlanId),
+    [allPlans, activePlanId]
+  );
 
   // Update URL when page changes
   useEffect(() => {
     window.location.hash = activePage;
   }, [activePage]);
+
+  useEffect(() => {
+    saveActivePlanId(activePlanId);
+  }, [activePlanId]);
+
+  useEffect(() => {
+    saveActivePlanDayIndex(activePlanDayIndex);
+  }, [activePlanDayIndex]);
+
+  useEffect(() => {
+    saveCustomPlans(customPlans);
+  }, [customPlans]);
 
   // Listen for URL changes
   useEffect(() => {
@@ -47,12 +86,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setActivePage(page);
   };
 
+  const handleSetActivePlanId = (planId: string | null) => {
+    setActivePlanId(planId);
+    if (planId === null) {
+      setActivePlanDayIndex(0);
+    }
+  };
+
+  const handleSetCustomPlans = (plans: IWorkoutPlan[]) => {
+    setCustomPlansState(plans);
+  };
+
   return (
-    <AppContext.Provider 
-      value={{ 
-        activePage, 
+    <AppContext.Provider
+      value={{
+        activePage,
         setActivePage: handleSetActivePage,
-        previousPage
+        previousPage,
+        activePlanId,
+        setActivePlanId: handleSetActivePlanId,
+        activePlanDayIndex,
+        setActivePlanDayIndex,
+        customPlans,
+        saveCustomPlans: handleSetCustomPlans,
+        activePlan,
+        allPlans,
       }}
     >
       {children}

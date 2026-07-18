@@ -1,6 +1,6 @@
 import React from "react";
 import { TypeAppMode } from "../../Types/AppTypes";
-import { useAppContext } from "../../Context/AppContext"; 
+import { useAppContext } from "../../Context/AppContext";
 import { useLanguage } from "../../Context/LanguageContext"; // Додаємо імпорт
 
 
@@ -8,16 +8,16 @@ interface IHeaderProps {
    currentMode: TypeAppMode;
    onModeChange: (mode: TypeAppMode) => void;
    onSettingsClick?: () => void;
-   // Removed isSettingsOpen prop, will use context directly
+   onPlansClick?: () => void;
 }
 
 export const Header: React.FC<IHeaderProps> = ({
    currentMode,
    onModeChange,
    onSettingsClick,
-   // Removed isSettingsOpen from props
+   onPlansClick,
 }) => {
-   const { activePage } = useAppContext(); 
+   const { activePage } = useAppContext();
    const { t } = useLanguage(); // Додаємо використання контексту мови
 
    const getButtonClasses = (mode: TypeAppMode) => {
@@ -30,7 +30,7 @@ export const Header: React.FC<IHeaderProps> = ({
 
       // If the active page is 'settings', always return the inactive state classes
       if (activePage === "settings") {
-         return inactiveClasses; 
+         return inactiveClasses;
       }
 
       if (mode === currentMode) {
@@ -73,12 +73,17 @@ export const Header: React.FC<IHeaderProps> = ({
                >
                   {t("exercise")}
                </button>
+               <button
+                  onClick={onPlansClick}
+                  className={activePage === "plans" ? "px-4 py-2 rounded-md bg-brand-green text-white shadow-md text-sm font-medium" : "px-4 py-2 rounded-md bg-transparent hover:bg-brand-green-light/20 text-brand-text border border-brand-border hover:border-brand-green-light text-sm font-medium"}
+               >
+                  {t("plans.title")}
+               </button>
             </div>
 
-            {/* Settings button - always visible and right-aligned within its container */}
             <button
                onClick={onSettingsClick}
-               className={settingsButtonClasses} // Use the dynamic classes here
+               className={settingsButtonClasses}
                aria-label="Settings"
             >
                <svg

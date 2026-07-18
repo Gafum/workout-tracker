@@ -3,17 +3,33 @@ import { Header } from "./Components/Header/Header";
 import { CalendarScroll } from "./Components/Calendar/CalendarScroll";
 import { WeightFood } from "./Pages/WeightFood/WeightFood";
 import { Exercise } from "./Pages/Exercise/Exercise";
-import { Settings } from "./Pages/Settings/Settings"; // Import the Settings component
-import { AppProvider, useAppContext } from "./Context/AppContext"; // Import AppProvider and useAppContext
-import { TypeAppMode } from "./Types/AppTypes"; // Keep TypeAppMode if still used elsewhere, though context replaces it for navigation
-import { MobileNav } from "./Components/MobileNav/MobileNav"; // Import MobileNav
+import { Settings } from "./Pages/Settings/Settings";
+import { Plans } from "./Pages/Plans/Plans";
+import { AppProvider, useAppContext } from "./Context/AppContext";
+import { TypeAppMode } from "./Types/AppTypes";
+import { MobileNav } from "./Components/MobileNav/MobileNav";
+import { ActivePlanWidget } from "./Components/ActivePlanWidget";
+import { saveExercisesForDay } from "./Utils/LocalStorageUtils";
+import { POPULAR_EXERCISES } from "./locales/PopularExercises/PopularExercises";
+import { useLanguage } from "./Context/LanguageContext";
 import "./index.css";
 import { LanguageProvider } from "./Context/LanguageContext";
 
 // Main App component content, wrapped in AppProvider
 const AppContent = () => {
-   const { activePage, setActivePage } = useAppContext();
+   const {
+      activePage,
+      setActivePage,
+      activePlan,
+      activePlanDayIndex,
+      setActivePlanDayIndex,
+   } = useAppContext();
+   const { language } = useLanguage();
    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+   const exerciseNames =
+      POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
+      POPULAR_EXERCISES.en;
 
    // Function to handle date changes from CalendarScroll
    const handleDateChange = (date: Date) => {
@@ -32,35 +48,80 @@ const AppContent = () => {
       setActivePage("settings");
    };
 
+   const handlePlansClick = () => {
+      setActivePage("plans");
+   };
+
+   const handleStartWorkout = () => {
+      if (!activePlan) {
+         setActivePage("plans");
+         return;
+      }
+
+      const today = new Date();
+      setSelectedDate(today);
+      const selectedDay =
+         activePlan.days[activePlanDayIndex] || activePlan.days[0];
+
+      const planExerciseEntries = selectedDay.exercises.map((exercise) => ({
+         id:
+            `${Date.now()}-${exercise.exerciseIndex}-${Math.random()
+               .toString(36)
+               .slice(2, 6)}`,
+         name:
+            exerciseNames[exercise.exerciseIndex] ||
+            `Exercise ${exercise.exerciseIndex}`,
+         details: null,
+         sets: Array.from({ length: exercise.sets }, (_, index) => ({
+            id: `${Date.now()}-${exercise.exerciseIndex}-${index}`,
+            reps: exercise.reps,
+            weight: exercise.defaultWeight ?? "",
+            notes: "",
+         })),
+      }));
+
+      saveExercisesForDay(today, planExerciseEntries as any);
+      setActivePage("exercise");
+   };
+
+   const handleSelectDay = (dayIndex: number) => {
+      setActivePlanDayIndex(dayIndex);
+   };
+
    return (
       // Add pb-16 (padding-bottom: 4rem, height of MobileNav) to prevent content overlap on mobile
       // Add sm:pb-0 to remove the padding on larger screens
       <div className="container mx-auto p-4 max-w-screen-md min-h-screen flex flex-col pb-16 sm:pb-0">
-         {/* Pass activePage and handlers to Header */}
          <Header
-            currentMode={activePage === "weight" ? "weight" : "exercise"} // Pass current mode based on activePage
+            currentMode={activePage === "weight" ? "weight" : "exercise"}
             onModeChange={handleModeChange}
-            onSettingsClick={handleSettingsClick} // Pass the settings click handler
+            onSettingsClick={handleSettingsClick}
+            onPlansClick={handlePlansClick}
          />
 
          {/* CalendarScroll is only relevant for Exercise and Weight pages */}
-         {activePage !== "settings" && (
+         {activePage !== "settings" && activePage !== "plans" && (
             <CalendarScroll
                selectedDate={selectedDate}
                onDateChange={handleDateChange}
             />
          )}
 
+         {activePage !== "settings" && activePage !== "plans" && (
+            <ActivePlanWidget
+               activePlan={activePlan}
+               activeDayIndex={activePlanDayIndex}
+               onOpenPlanCatalog={handlePlansClick}
+               onSelectDay={handleSelectDay}
+               onStartWorkout={handleStartWorkout}
+            />
+         )}
+
          <main className="flex-grow">
-            {/* Render content based on activePage */}
-            {activePage === "weight" && (
-               <WeightFood selectedDate={selectedDate} />
-            )}
-            {activePage === "exercise" && (
-               <Exercise selectedDate={selectedDate} />
-            )}
-            {activePage === "settings" && <Settings />}{" "}
-            {/* Render Settings page */}
+            {activePage === "weight" && <WeightFood selectedDate={selectedDate} />}
+            {activePage === "exercise" && <Exercise selectedDate={selectedDate} />}
+            {activePage === "settings" && <Settings />}
+            {activePage === "plans" && <Plans />}
          </main>
 
          {/* Mobile Navigation - shown only on small screens */}

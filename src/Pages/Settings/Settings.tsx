@@ -7,6 +7,7 @@ import {
 } from "../../Utils/LocalStorageUtils";
 import { EditExerciseModal } from "../../Components/SettingsPage/EditExerciseModal";
 import { DeleteExerciseModal } from "../../Components/SettingsPage/DeleteExerciseModal";
+import { useAppContext } from "../../Context/AppContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -30,6 +31,7 @@ export const Settings: React.FC = () => {
       loadUnitPreferences()
    );
    const { language: currentLanguage, setLanguage, t, getDateLocale } = useLanguage();
+   const { activePlanId, setActivePlanId, setActivePlanDayIndex } = useAppContext();
 
    useEffect(() => {
       loadExerciseNames();
@@ -121,11 +123,10 @@ export const Settings: React.FC = () => {
                            key={unit}
                            onClick={() => handleUnitChange("weight", unit)}
                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                                     ${
-                                        unitPreferences.weight === unit
-                                           ? "bg-brand-green text-white shadow-sm"
-                                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                     }`}
+                                     ${unitPreferences.weight === unit
+                                 ? "bg-brand-green text-white shadow-sm"
+                                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                              }`}
                         >
                            {unit.toUpperCase()}
                         </button>
@@ -144,11 +145,10 @@ export const Settings: React.FC = () => {
                            key={unit}
                            onClick={() => handleUnitChange("height", unit)}
                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                                     ${
-                                        unitPreferences.height === unit
-                                           ? "bg-brand-green text-white shadow-sm"
-                                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                     }`}
+                                     ${unitPreferences.height === unit
+                                 ? "bg-brand-green text-white shadow-sm"
+                                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                              }`}
                         >
                            {unit.toUpperCase()}
                         </button>
@@ -169,11 +169,10 @@ export const Settings: React.FC = () => {
                      key={day}
                      onClick={() => handleUnitChange("calendarWeekStart", day)}
                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                               ${
-                                  unitPreferences.calendarWeekStart === day
-                                     ? "bg-brand-green text-white shadow-sm"
-                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                               }`}
+                               ${unitPreferences.calendarWeekStart === day
+                           ? "bg-brand-green text-white shadow-sm"
+                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
                   >
                      {t(
                         day === "sunday" ? "calendar_sunday" : "calendar_monday"
@@ -241,11 +240,10 @@ export const Settings: React.FC = () => {
             </button>
             {copyStatus && (
                <p
-                  className={`mt-2 text-sm ${
-                     copyStatus.startsWith(t("copy_error"))
+                  className={`mt-2 text-sm ${copyStatus.startsWith(t("copy_error"))
                         ? "text-red-600"
                         : "text-green-600"
-                  }`}
+                     }`}
                >
                   {copyStatus}
                </p>
@@ -266,6 +264,38 @@ export const Settings: React.FC = () => {
                <option value="de">{t("german")}</option>
                <option value="ru">{t("russian")}</option>
             </select>
+         </div>
+
+         <div className="mb-6 rounded-2xl border border-brand-border bg-brand-green/5 p-4">
+            <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
+               {t("plans.settings_title")}
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+               {t("plans.settings_description")}
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+               <button
+                  type="button"
+                  onClick={() => setActivePlanId(null)}
+                  className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+               >
+                  {t("plans.clear_active_plan")}
+               </button>
+               <button
+                  type="button"
+                  onClick={() => {
+                     setActivePlanDayIndex(0);
+                  }}
+                  className="rounded-full border border-brand-green bg-white px-4 py-2 text-sm font-semibold text-brand-green transition hover:bg-brand-green/10"
+               >
+                  {t("plans.reset_plan_day")}
+               </button>
+            </div>
+            {activePlanId && (
+               <p className="mt-3 text-sm text-gray-700">
+                  {t("plans.current_active_plan")}: {activePlanId}
+               </p>
+            )}
          </div>
 
          <div className="mb-6">
