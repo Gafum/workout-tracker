@@ -9,7 +9,6 @@ export const Plans: React.FC = () => {
       customPlans,
       setActivePlanId,
       saveCustomPlans,
-      allPlans,
    } = useAppContext();
    const { t } = useLanguage();
 

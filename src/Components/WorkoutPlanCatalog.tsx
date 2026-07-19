@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useLanguage } from "../Context/LanguageContext";
 import { POPULAR_EXERCISES } from "../locales/PopularExercises/PopularExercises";
-import { IWorkoutPlan, IWorkoutDay, IPlanExercise } from "../Types/plan";
+import { IWorkoutPlan, IPlanExercise } from "../Types/plan";
 import { PRESET_WORKOUT_PLANS } from "../constants/presetPlans";
 
 interface IWorkoutPlanCatalogProps {
@@ -52,11 +52,6 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
    const selectedPlan = useMemo(
       () => allPlans.find((plan) => plan.id === expandedPlanId) || null,
       [allPlans, expandedPlanId]
-   );
-
-   const customPlanOptions = useMemo(
-      () => customPlans.map((plan) => ({ id: plan.id, title: formatPlanTitle(plan, t) })),
-      [customPlans, t]
    );
 
    const handlePlanSelect = (planId: string) => {
@@ -256,8 +251,8 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
                               type="button"
                               onClick={() => onSetActivePlan(plan.id)}
                               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${isActive
-                                    ? "bg-brand-green text-white"
-                                    : "bg-gray-100 text-gray-800 hover:bg-brand-green hover:text-white"
+                                 ? "bg-brand-green text-white"
+                                 : "bg-gray-100 text-gray-800 hover:bg-brand-green hover:text-white"
                                  }`}
                            >
                               {isActive ? t("plans.active_label") : t("plans.set_active_plan")}
@@ -509,7 +504,7 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
                                                 day.dayId,
                                                 exerciseIndex,
                                                 "defaultWeight",
-                                                event.target.value === "" ? undefined : Number(event.target.value)
+                                                event.target.value === "" ? "" : Number(event.target.value)
                                              )
                                           }
                                           className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"

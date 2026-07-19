@@ -1,7 +1,6 @@
 import React from "react";
 import { IWorkoutPlan } from "../Types/plan";
 import { useLanguage } from "../Context/LanguageContext";
-import { POPULAR_EXERCISES } from "../locales/PopularExercises/PopularExercises";
 
 interface IActivePlanWidgetProps {
    activePlan?: IWorkoutPlan | null;
@@ -18,9 +17,7 @@ export const ActivePlanWidget: React.FC<IActivePlanWidgetProps> = ({
    onSelectDay,
    onStartWorkout,
 }) => {
-   const { t, language } = useLanguage();
-   const exerciseNames = POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
-      POPULAR_EXERCISES.en;
+   const { t } = useLanguage();
 
    if (!activePlan) {
       return (
@@ -78,8 +75,8 @@ export const ActivePlanWidget: React.FC<IActivePlanWidgetProps> = ({
                   type="button"
                   onClick={() => onSelectDay(index)}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${index === activeDayIndex
-                        ? "border-brand-green bg-brand-green text-white"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-brand-green hover:text-brand-green"
+                     ? "border-brand-green bg-brand-green text-white"
+                     : "border-gray-200 bg-white text-gray-700 hover:border-brand-green hover:text-brand-green"
                      }`}
                >
                   {t(day.dayNameKey)}
