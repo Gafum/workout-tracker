@@ -93,7 +93,6 @@ const AppContent = () => {
       // Add sm:pb-0 to remove the padding on larger screens
       <div className="container mx-auto p-4 max-w-screen-md min-h-screen flex flex-col pb-16 sm:pb-0">
          <Header
-            currentMode={activePage === "weight" ? "weight" : "exercise"}
             onModeChange={handleModeChange}
             onSettingsClick={handleSettingsClick}
             onPlansClick={handlePlansClick}
@@ -127,11 +126,10 @@ const AppContent = () => {
          {/* Mobile Navigation - shown only on small screens */}
          {/* Removed the condition activePage !== 'settings' */}
          <div className="sm:hidden">
-            {" "}
             {/* Wrapper div to apply sm:hidden */}
             <MobileNav
-               currentMode={activePage === "weight" ? "weight" : "exercise"}
                onModeChange={handleModeChange}
+               onPlansClick={handlePlansClick}
             />
          </div>
 

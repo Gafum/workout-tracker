@@ -5,14 +5,12 @@ import { useLanguage } from "../../Context/LanguageContext"; // Додаємо �
 
 
 interface IHeaderProps {
-   currentMode: TypeAppMode;
    onModeChange: (mode: TypeAppMode) => void;
    onSettingsClick?: () => void;
    onPlansClick?: () => void;
 }
 
 export const Header: React.FC<IHeaderProps> = ({
-   currentMode,
    onModeChange,
    onSettingsClick,
    onPlansClick,
@@ -21,6 +19,7 @@ export const Header: React.FC<IHeaderProps> = ({
    const { t } = useLanguage(); // Додаємо використання контексту мови
 
    const getButtonClasses = (mode: TypeAppMode) => {
+
       // Base classes for all buttons
       const baseClasses =
          "px-4 py-2 rounded-md transition-colors duration-150 ease-in-out text-sm font-medium";
@@ -28,12 +27,7 @@ export const Header: React.FC<IHeaderProps> = ({
       // Inactive button style - updated
       const inactiveClasses = `${baseClasses} bg-transparent hover:bg-brand-green-light/20 text-brand-text border border-brand-border hover:border-brand-green-light`;
 
-      // If the active page is 'settings', always return the inactive state classes
-      if (activePage === "settings") {
-         return inactiveClasses;
-      }
-
-      if (mode === currentMode) {
+      if (mode === activePage) {
          // Active button style
          return `${baseClasses} bg-brand-green text-white shadow-md`;
       } else {
