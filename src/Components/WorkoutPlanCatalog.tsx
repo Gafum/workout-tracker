@@ -7,7 +7,7 @@ import { PRESET_WORKOUT_PLANS } from "../constants/presetPlans";
 interface IWorkoutPlanCatalogProps {
    activePlanId?: string | null;
    customPlans: IWorkoutPlan[];
-   onSetActivePlan: (planId: string) => void;
+   onSetActivePlan: (planId: string | null) => void;
    onSaveCustomPlans: (plans: IWorkoutPlan[]) => void;
 }
 
@@ -36,26 +36,36 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
    onSaveCustomPlans,
 }) => {
    const { t, language } = useLanguage();
-   const exerciseNames = POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
+   const exerciseNames =
+      POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
       POPULAR_EXERCISES.en;
+
    const allPlans = useMemo(
       () => [...PRESET_WORKOUT_PLANS, ...customPlans],
       [customPlans]
    );
 
-   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(
-      activePlanId || allPlans[0]?.id || null
-   );
+   // Зберігаємо IDs відкритих акордеонів
+   const [expandedPlanIds, setExpandedPlanIds] = useState<string[]>([]);
    const [draftPlan, setDraftPlan] = useState<IWorkoutPlan>(createEmptyPlan());
    const [isEditing, setIsEditing] = useState(false);
 
-   const selectedPlan = useMemo(
-      () => allPlans.find((plan) => plan.id === expandedPlanId) || null,
-      [allPlans, expandedPlanId]
-   );
+   // Відкрити/закрити детальну інформацію про план (Dropdown/Accordion)
+   const toggleExpandPlan = (planId: string) => {
+      setExpandedPlanIds((prev) =>
+         prev.includes(planId)
+            ? prev.filter((id) => id !== planId)
+            : [...prev, planId]
+      );
+   };
 
-   const handlePlanSelect = (planId: string) => {
-      setExpandedPlanId(planId);
+   // Активація / Деактивація плану
+   const handleToggleActivePlan = (planId: string) => {
+      if (activePlanId === planId) {
+         onSetActivePlan(null); // Деактивувати
+      } else {
+         onSetActivePlan(planId); // Активувати
+      }
    };
 
    const handleAddDay = () => {
@@ -135,7 +145,9 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
             day.dayId === dayId
                ? {
                   ...day,
-                  exercises: day.exercises.filter((_, exerciseIndex) => exerciseIndex !== index),
+                  exercises: day.exercises.filter(
+                     (_, exerciseIndex) => exerciseIndex !== index
+                  ),
                }
                : day
          ),
@@ -169,283 +181,277 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
       onSaveCustomPlans(nextPlans);
       setIsEditing(false);
       setDraftPlan(createEmptyPlan());
-      setExpandedPlanId(nextPlan.id);
+
+      // Автоматично розгортаємо збережений план
+      if (!expandedPlanIds.includes(nextPlan.id)) {
+         setExpandedPlanIds((prev) => [...prev, nextPlan.id]);
+      }
    };
 
-   const handleEditCustomPlan = (planId: string) => {
-      const planToEdit = customPlans.find((plan) => plan.id === planId);
-      if (!planToEdit) {
-         return;
-      }
-      setDraftPlan(planToEdit);
+   const handleEditCustomPlan = (plan: IWorkoutPlan) => {
+      setDraftPlan(plan);
       setIsEditing(true);
-      setExpandedPlanId(planId);
+      // Скролл до форми редагування
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
    };
 
    const handleDeleteCustomPlan = (planId: string) => {
       const filteredPlans = customPlans.filter((plan) => plan.id !== planId);
       onSaveCustomPlans(filteredPlans);
-      if (expandedPlanId === planId) {
-         setExpandedPlanId(filteredPlans[0]?.id || PRESET_WORKOUT_PLANS[0]?.id || null);
-      }
    };
 
    return (
-      <div className="space-y-6 py-4">
-         <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-               <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">
-                     {t("plans.catalog_title")}
-                  </p>
-                  <h1 className="mt-2 text-2xl font-semibold text-brand-text">
-                     {t("plans.catalog_subtitle")}
-                  </h1>
-                  <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-600">
-                     {t("plans.catalog_description")}
-                  </p>
-               </div>
-               <button
-                  type="button"
-                  onClick={() => {
-                     setDraftPlan(createEmptyPlan());
-                     setIsEditing(true);
-                  }}
-                  className="inline-flex items-center justify-center rounded-full bg-brand-green px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-green-dark"
-               >
-                  {t("plans.create_custom_plan")}
-               </button>
-            </div>
-         </div>
+      <div className="space-y-6 py-2">
 
-         <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
-            <div className="space-y-4">
-               {allPlans.map((plan) => {
-                  const isActive = plan.id === activePlanId;
-                  return (
-                     <article key={plan.id} className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                           <div>
+         <div className="space-y-4">
+            {allPlans.map((plan) => {
+               const isActive = plan.id === activePlanId;
+               const isExpanded = expandedPlanIds.includes(plan.id);
+
+               return (
+                  <article
+                     key={plan.id}
+                     className={`rounded-xl border bg-white transition shadow-sm ${isActive ? "border-brand-green ring-1 ring-brand-green/30" : "border-gray-200"
+                        }`}
+                  >
+                     <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                        <div
+                           className="flex-1 cursor-pointer"
+                           onClick={() => toggleExpandPlan(plan.id)}
+                        >
+                           <div className="flex items-center gap-2">
                               <h2 className="text-lg font-semibold text-brand-text">
                                  {formatPlanTitle(plan, t)}
                               </h2>
-                              <p className="mt-1 text-sm text-gray-500">
-                                 {plan.categoryKey ? t(plan.categoryKey) : t("plans.category.custom")}
-                              </p>
+                              {plan.isCustom && (
+                                 <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                                    Custom
+                                 </span>
+                              )}
                            </div>
-                           <div className="flex flex-wrap items-center gap-2">
-                              <span className="rounded-full bg-brand-green/10 px-3 py-1 text-xs font-semibold text-brand-green">
-                                 {plan.days.length} {t("plans.days")}
-                              </span>
-                              <button
-                                 type="button"
-                                 onClick={() => handlePlanSelect(plan.id)}
-                                 className="rounded-full border border-brand-green bg-white px-4 py-2 text-sm font-semibold text-brand-green transition hover:bg-brand-green hover:text-white"
-                              >
-                                 {t("plans.view_details")}
-                              </button>
-                           </div>
+                           <p className="mt-1 text-sm text-gray-500">
+                              {plan.categoryKey ? t(plan.categoryKey) : t("plans.category.custom")}
+                           </p>
                         </div>
-                        <div className="mt-4 flex flex-wrap gap-2">
+
+                        <div className="flex flex-wrap items-center gap-3">
+                           <span className="rounded-full bg-brand-green/10 px-3 py-1 text-xs font-semibold text-brand-green">
+                              {plan.days.length} {t("plans.days")}
+                           </span>
+
                            <button
                               type="button"
-                              onClick={() => onSetActivePlan(plan.id)}
-                              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${isActive
-                                 ? "bg-brand-green text-white"
-                                 : "bg-gray-100 text-gray-800 hover:bg-brand-green hover:text-white"
+                              onClick={() => handleToggleActivePlan(plan.id)}
+                              title={isActive ? t("plans.active_label") : t("plans.set_active_plan")}
+                              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${isActive
+                                 ? "bg-brand-green text-white hover:bg-red-600"
+                                 : "bg-gray-100 text-gray-700 hover:bg-brand-green hover:text-white"
                                  }`}
                            >
-                              {isActive ? t("plans.active_label") : t("plans.set_active_plan")}
+                              {isActive ? (
+                                 <>
+                                    {/* Іконка Активного стану / Вимкнення */}
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>{t("plans.active_label")}</span>
+                                 </>
+                              ) : (
+                                 <>
+                                    {/* Іконка Деактивованого стану / Увімкнення */}
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>{t("plans.set_active_plan")}</span>
+                                 </>
+                              )}
                            </button>
+
                            {plan.isCustom && (
-                              <>
+                              <div className="flex items-center gap-1">
                                  <button
                                     type="button"
-                                    onClick={() => handleEditCustomPlan(plan.id)}
-                                    className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-brand-green hover:text-brand-green"
+                                    onClick={() => handleEditCustomPlan(plan)}
+                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-brand-green"
+                                    title={t("plans.edit_custom_plan")}
                                  >
-                                    {t("plans.edit_custom_plan")}
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
                                  </button>
                                  <button
                                     type="button"
                                     onClick={() => handleDeleteCustomPlan(plan.id)}
-                                    className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                                    className="rounded-lg p-2 text-red-500 hover:bg-red-50"
+                                    title={t("plans.delete_custom_plan")}
                                  >
-                                    {t("plans.delete_custom_plan")}
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                  </button>
-                              </>
+                              </div>
                            )}
-                        </div>
-                     </article>
-                  );
-               })}
-            </div>
 
-            <aside className="space-y-4">
-               {selectedPlan ? (
-                  <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-                     <div className="flex items-start justify-between gap-4">
-                        <div>
-                           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">
-                              {t("plans.plan_preview")}
-                           </p>
-                           <h2 className="mt-2 text-xl font-semibold text-brand-text">
-                              {formatPlanTitle(selectedPlan, t)}
-                           </h2>
+                           <button
+                              type="button"
+                              onClick={() => toggleExpandPlan(plan.id)}
+                              className="hidden sm:block rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                           >
+                              <svg
+                                 className={`h-5 w-5 transform transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24"
+                              >
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                              </svg>
+                           </button>
                         </div>
-                        <span className="rounded-full bg-brand-green/10 px-3 py-1 text-xs font-semibold text-brand-green">
-                           {selectedPlan.days.length} {t("plans.days")}
-                        </span>
                      </div>
-                     <div className="mt-4 divide-y divide-gray-200">
-                        {selectedPlan.days.map((day) => (
-                           <div key={day.dayId} className="py-4">
-                              <h3 className="text-sm font-semibold text-brand-text">
-                                 {t(day.dayNameKey)}
-                              </h3>
-                              <ul className="mt-3 space-y-2 text-sm text-gray-600">
-                                 {day.exercises.map((exercise, index) => (
-                                    <li key={`${day.dayId}-${index}`} className="rounded-2xl border border-gray-100 bg-gray-50 p-3">
-                                       <div className="flex items-center justify-between gap-3">
-                                          <span className="font-medium text-brand-text">
-                                             {exerciseNames[exercise.exerciseIndex] || `Exercise ${exercise.exerciseIndex}`}
-                                          </span>
-                                          <span className="text-xs text-gray-500">
-                                             {exercise.sets}x {exercise.reps}
-                                          </span>
-                                       </div>
-                                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                                          {exercise.defaultWeight !== undefined && (
-                                             <span>{t("plans.standard_weight")}: {exercise.defaultWeight}</span>
-                                          )}
-                                          {exercise.proTipKey && (
-                                             <span>{t(exercise.proTipKey)}</span>
-                                          )}
-                                       </div>
-                                    </li>
-                                 ))}
-                                 {day.exercises.length === 0 && (
-                                    <li className="text-xs text-gray-500">{t("plans.no_exercises_in_day")}</li>
-                                 )}
-                              </ul>
+
+                     {isExpanded && (
+                        <div className="border-t border-gray-100 bg-gray-50/50 p-4 sm:p-5">
+                           <div className="grid gap-4">
+                              {plan.days.map((day) => (
+                                 <div key={day.dayId} className="rounded-xl border border-gray-200 bg-white p-4">
+                                    <h3 className="font-semibold text-brand-text">
+                                       {t(day.dayNameKey)}
+                                    </h3>
+                                    <ul className="mt-3 space-y-2 text-sm text-gray-600">
+                                       {day.exercises.map((exercise, index) => (
+                                          <li key={`${day.dayId}-${index}`} className="rounded-lg bg-gray-50 p-2.5">
+                                             <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium text-brand-text">
+                                                   {exerciseNames[exercise.exerciseIndex] || `Exercise ${exercise.exerciseIndex}`}
+                                                </span>
+                                                <span className="text-xs font-semibold text-gray-500">
+                                                   {exercise.sets}x {exercise.reps}
+                                                </span>
+                                             </div>
+                                             {(exercise.defaultWeight !== undefined || exercise.proTipKey) && (
+                                                <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-500">
+                                                   {exercise.defaultWeight !== undefined && (
+                                                      <span>{t("plans.standard_weight")}: {exercise.defaultWeight}</span>
+                                                   )}
+                                                   {exercise.proTipKey && <span>{t(exercise.proTipKey)}</span>}
+                                                </div>
+                                             )}
+                                          </li>
+                                       ))}
+                                       {day.exercises.length === 0 && (
+                                          <li className="text-xs text-gray-400 italic">
+                                             {t("plans.no_exercises_in_day")}
+                                          </li>
+                                       )}
+                                    </ul>
+                                 </div>
+                              ))}
                            </div>
-                        ))}
-                     </div>
-                  </section>
-               ) : (
-                  <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-                     <p className="text-sm text-gray-500">{t("plans.select_plan_to_preview")}</p>
-                  </div>
-               )}
-
-               <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-                  <h2 className="text-lg font-semibold text-brand-text">
-                     {t("plans.custom_plan_builder")}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                     {t("plans.custom_plan_builder_description")}
-                  </p>
-                  <div className="mt-4 space-y-3">
-                     <label className="block text-sm font-medium text-gray-700">
-                        {t("plans.custom_plan_title")}
-                     </label>
-                     <input
-                        type="text"
-                        value={draftPlan.titleKey}
-                        onChange={(event) =>
-                           setDraftPlan((previous) => ({ ...previous, titleKey: event.target.value }))
-                        }
-                        className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
-                     />
-                     <label className="block text-sm font-medium text-gray-700">
-                        {t("plans.custom_plan_description")}
-                     </label>
-                     <textarea
-                        value={draftPlan.descriptionKey}
-                        onChange={(event) =>
-                           setDraftPlan((previous) => ({ ...previous, descriptionKey: event.target.value }))
-                        }
-                        rows={3}
-                        className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
-                     />
-                     <div className="flex flex-wrap gap-2">
-                        <button
-                           type="button"
-                           onClick={handleAddDay}
-                           className="rounded-full bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark"
-                        >
-                           {t("plans.add_day")}
-                        </button>
-                        <button
-                           type="button"
-                           onClick={handleSaveDraft}
-                           className="rounded-full bg-brand-green/90 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark"
-                        >
-                           {isEditing ? t("plans.update_custom_plan") : t("plans.save_custom_plan")}
-                        </button>
-                     </div>
-                  </div>
-               </section>
-            </aside>
+                        </div>
+                     )}
+                  </article>
+               );
+            })}
          </div>
 
-         {isEditing && (
-            <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-               <h2 className="text-lg font-semibold text-brand-text">
-                  {t("plans.editing_custom_plan")}
-               </h2>
-               <div className="mt-4 space-y-5">
+         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-center justify-between">
+               <div>
+                  <h2 className="text-xl font-semibold text-brand-text">
+                     {isEditing ? t("plans.editing_custom_plan") : t("plans.custom_plan_builder")}
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                     {t("plans.custom_plan_builder_description")}
+                  </p>
+               </div>
+               {isEditing && (
+                  <button
+                     type="button"
+                     onClick={() => {
+                        setIsEditing(false);
+                        setDraftPlan(createEmptyPlan());
+                     }}
+                     className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                     Cancel Edit
+                  </button>
+               )}
+            </div>
+
+            <div className="mt-5 space-y-4">
+               <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                     {t("plans.custom_plan_title")}
+                  </label>
+                  <input
+                     type="text"
+                     value={draftPlan.titleKey}
+                     onChange={(e) => setDraftPlan((prev) => ({ ...prev, titleKey: e.target.value }))}
+                     className="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                  />
+               </div>
+
+               <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                     {t("plans.custom_plan_description")}
+                  </label>
+                  <textarea
+                     value={draftPlan.descriptionKey}
+                     onChange={(e) => setDraftPlan((prev) => ({ ...prev, descriptionKey: e.target.value }))}
+                     rows={2}
+                     className="mt-1 w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                  />
+               </div>
+
+               <div className="space-y-4 pt-2">
                   {draftPlan.days.map((day, dayIndex) => (
-                     <div key={day.dayId} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                     <div key={day.dayId} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                           <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                           <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-600">
                                  {t("plans.day_name")}
                               </label>
                               <input
                                  type="text"
                                  value={day.dayNameKey}
-                                 onChange={(event) =>
-                                    setDraftPlan((previous) => ({
-                                       ...previous,
-                                       days: previous.days.map((currentDay, index) =>
-                                          index === dayIndex
-                                             ? { ...currentDay, dayNameKey: event.target.value }
-                                             : currentDay
+                                 onChange={(e) =>
+                                    setDraftPlan((prev) => ({
+                                       ...prev,
+                                       days: prev.days.map((d, idx) =>
+                                          idx === dayIndex ? { ...d, dayNameKey: e.target.value } : d
                                        ),
                                     }))
                                  }
-                                 className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                                 className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-green"
                               />
                            </div>
                            <button
                               type="button"
                               onClick={() => handleRemoveDay(day.dayId)}
-                              className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                              className="self-end rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 sm:self-center"
                            >
                               {t("plans.remove_day")}
                            </button>
                         </div>
 
-                        <div className="mt-4 space-y-4">
+                        {/* Вправи для конкретного дня */}
+                        <div className="mt-4 space-y-3">
                            {day.exercises.map((exercise, exerciseIndex) => (
-                              <div key={`${day.dayId}-exercise-${exerciseIndex}`} className="rounded-2xl border border-gray-200 bg-white p-4">
-                                 <div className="grid gap-3 sm:grid-cols-2">
-                                    <div>
-                                       <label className="block text-sm font-medium text-gray-700">
-                                          {t("plans.exercise")}
-                                       </label>
+                              <div key={`${day.dayId}-ex-${exerciseIndex}`} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+                                 <div className="grid gap-3 sm:grid-cols-4">
+                                    <div className="sm:col-span-2">
+                                       <label className="block text-xs text-gray-500">{t("plans.exercise")}</label>
                                        <select
                                           value={exercise.exerciseIndex}
-                                          onChange={(event) =>
+                                          onChange={(e) =>
                                              handleUpdateExercise(
                                                 day.dayId,
                                                 exerciseIndex,
                                                 "exerciseIndex",
-                                                Number(event.target.value)
+                                                Number(e.target.value)
                                              )
                                           }
-                                          className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2 text-sm"
                                        >
                                           {exerciseNames.map((label, optionIndex) => (
                                              <option key={optionIndex} value={optionIndex}>
@@ -455,104 +461,73 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
                                        </select>
                                     </div>
                                     <div>
-                                       <label className="block text-sm font-medium text-gray-700">
-                                          {t("plans.sets")}
-                                       </label>
+                                       <label className="block text-xs text-gray-500">{t("plans.sets")}</label>
                                        <input
                                           type="number"
                                           min={1}
                                           value={exercise.sets}
-                                          onChange={(event) =>
-                                             handleUpdateExercise(
-                                                day.dayId,
-                                                exerciseIndex,
-                                                "sets",
-                                                Number(event.target.value)
-                                             )
+                                          onChange={(e) =>
+                                             handleUpdateExercise(day.dayId, exerciseIndex, "sets", Number(e.target.value))
                                           }
-                                          className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                        />
                                     </div>
                                     <div>
-                                       <label className="block text-sm font-medium text-gray-700">
-                                          {t("plans.reps")}
-                                       </label>
+                                       <label className="block text-xs text-gray-500">{t("plans.reps")}</label>
                                        <input
                                           type="text"
                                           value={exercise.reps}
-                                          onChange={(event) =>
-                                             handleUpdateExercise(
-                                                day.dayId,
-                                                exerciseIndex,
-                                                "reps",
-                                                event.target.value
-                                             )
+                                          onChange={(e) =>
+                                             handleUpdateExercise(day.dayId, exerciseIndex, "reps", e.target.value)
                                           }
-                                          className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
-                                       />
-                                    </div>
-                                    <div>
-                                       <label className="block text-sm font-medium text-gray-700">
-                                          {t("plans.default_weight")}
-                                       </label>
-                                       <input
-                                          type="number"
-                                          min={0}
-                                          value={exercise.defaultWeight ?? ""}
-                                          onChange={(event) =>
-                                             handleUpdateExercise(
-                                                day.dayId,
-                                                exerciseIndex,
-                                                "defaultWeight",
-                                                event.target.value === "" ? "" : Number(event.target.value)
-                                             )
-                                          }
-                                          className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
-                                       />
-                                    </div>
-                                    <div className="sm:col-span-2">
-                                       <label className="block text-sm font-medium text-gray-700">
-                                          {t("plans.pro_tip")}
-                                       </label>
-                                       <input
-                                          type="text"
-                                          value={exercise.proTipKey ?? ""}
-                                          onChange={(event) =>
-                                             handleUpdateExercise(
-                                                day.dayId,
-                                                exerciseIndex,
-                                                "proTipKey",
-                                                event.target.value
-                                             )
-                                          }
-                                          className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-green focus:ring-1 focus:ring-brand-green/20"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                        />
                                     </div>
                                  </div>
-                                 <div className="mt-3 text-right">
+
+                                 <div className="mt-2 flex items-center justify-end">
                                     <button
                                        type="button"
                                        onClick={() => handleRemoveExercise(day.dayId, exerciseIndex)}
-                                       className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                                       className="text-xs font-medium text-red-500 hover:underline"
                                     >
                                        {t("plans.remove_exercise")}
                                     </button>
                                  </div>
                               </div>
                            ))}
+
                            <button
                               type="button"
                               onClick={() => handleAddExercise(day.dayId)}
-                              className="rounded-full bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark"
+                              className="mt-2 text-xs font-semibold text-brand-green hover:underline"
                            >
-                              {t("plans.add_exercise")}
+                              + {t("plans.add_exercise")}
                            </button>
                         </div>
                      </div>
                   ))}
                </div>
-            </section>
-         )}
+
+               {/* Кнопки управління внизу форми */}
+               <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                     type="button"
+                     onClick={handleAddDay}
+                     className="rounded-lg border border-brand-green bg-white px-4 py-2 text-sm font-semibold text-brand-green transition hover:bg-brand-green/10"
+                  >
+                     {t("plans.add_day")}
+                  </button>
+                  <button
+                     type="button"
+                     onClick={handleSaveDraft}
+                     className="rounded-lg bg-brand-green px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark"
+                  >
+                     {isEditing ? t("plans.update_custom_plan") : t("plans.save_custom_plan")}
+                  </button>
+               </div>
+            </div>
+         </section>
       </div>
    );
 };

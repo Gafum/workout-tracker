@@ -241,8 +241,8 @@ export const Settings: React.FC = () => {
             {copyStatus && (
                <p
                   className={`mt-2 text-sm ${copyStatus.startsWith(t("copy_error"))
-                        ? "text-red-600"
-                        : "text-green-600"
+                     ? "text-red-600"
+                     : "text-green-600"
                      }`}
                >
                   {copyStatus}
@@ -280,15 +280,6 @@ export const Settings: React.FC = () => {
                   className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
                >
                   {t("plans.clear_active_plan")}
-               </button>
-               <button
-                  type="button"
-                  onClick={() => {
-                     setActivePlanDayIndex(0);
-                  }}
-                  className="rounded-full border border-brand-green bg-white px-4 py-2 text-sm font-semibold text-brand-green transition hover:bg-brand-green/10"
-               >
-                  {t("plans.reset_plan_day")}
                </button>
             </div>
             {activePlanId && (

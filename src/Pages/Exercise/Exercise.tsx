@@ -5,8 +5,7 @@ import {
    getAllExerciseNames,
 } from "../../Utils/LocalStorageUtils";
 import { format } from "date-fns";
-// ...
-// --- Import the new LoggedExerciseList component ---
+
 import { LoggedExerciseList } from "../../Components/ExercisePage/LoggedExerciseList"; // Added import
 import { useLanguage } from "../../Context/LanguageContext"; // Add this import
 
@@ -14,7 +13,9 @@ import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 import { de, enUS, Locale, ru, uk } from "date-fns/locale";
 import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
 import { ImportModal } from "../../Components/ExercisePage/ImportModal";
+import { ActivePlanWidget } from "../../Components/ActivePlanWidget";
 import { POPULAR_EXERCISES } from "../../locales/PopularExercises/PopularExercises";
+import { useAppContext } from "../../Context/AppContext";
 
 interface IExerciseProps {
    selectedDate: Date;
@@ -23,7 +24,16 @@ interface IExerciseProps {
 const MAX_SETS = 10; // Define a reasonable maximum number of sets
 
 export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
-   const { t, language } = useLanguage(); // Add this line to use translations
+   const { t, language } = useLanguage();
+   const {
+      activePlan,
+      activePlanDayIndex,
+      setActivePlanDayIndex,
+      setActivePage,
+   } = useAppContext();
+   const exerciseNames =
+      POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
+      POPULAR_EXERCISES.en;
    // --- State ---
    const [dailyExercises, setDailyExercises] = useState<IExerciseEntry[]>([]);
    const [suggestionSource, setSuggestionSource] = useState<string[]>([]);
@@ -49,18 +59,18 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
 
       const validatedExercises: IExerciseEntry[] = Array.isArray(loadedData)
          ? loadedData
-              .map((item: any) => {
-                 if (item && typeof item.name === "string" && item.id) {
-                    return {
-                       ...item,
-                       name: item.name,
-                       id: item.id,
-                       sets: Array.isArray(item.sets) ? item.sets : [],
-                    };
-                 }
-                 return null;
-              })
-              .filter((item): item is IExerciseEntry => item !== null)
+            .map((item: any) => {
+               if (item && typeof item.name === "string" && item.id) {
+                  return {
+                     ...item,
+                     name: item.name,
+                     id: item.id,
+                     sets: Array.isArray(item.sets) ? item.sets : [],
+                  };
+               }
+               return null;
+            })
+            .filter((item): item is IExerciseEntry => item !== null)
          : [];
 
       setDailyExercises(validatedExercises);
@@ -181,18 +191,18 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
             exercises
          )
             ? exercises
-                 .map((item: any) => {
-                    if (item && typeof item.name === "string" && item.id) {
-                       return {
-                          ...item,
-                          name: item.name,
-                          id: item.id,
-                          sets: Array.isArray(item.sets) ? item.sets : [],
-                       };
-                    }
-                    return null;
-                 })
-                 .filter((item): item is IExerciseEntry => item !== null)
+               .map((item: any) => {
+                  if (item && typeof item.name === "string" && item.id) {
+                     return {
+                        ...item,
+                        name: item.name,
+                        id: item.id,
+                        sets: Array.isArray(item.sets) ? item.sets : [],
+                     };
+                  }
+                  return null;
+               })
+               .filter((item): item is IExerciseEntry => item !== null)
             : [];
          setImportExercises(validatedImportExercises);
          setSelectedToImport([]);
@@ -354,6 +364,38 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       saveExercisesForDay(selectedDate, reorderedExercises);
    };
 
+   const handleOpenPlanCatalog = () => {
+      setActivePage("plans");
+   };
+
+   const handleSelectDay = (dayIndex: number) => {
+      setActivePlanDayIndex(dayIndex);
+   };
+
+   const handleStartWorkout = () => {
+      if (!activePlan) {
+         setActivePage("plans");
+         return;
+      }
+
+      const today = new Date();
+      const selectedDay = activePlan.days[activePlanDayIndex] || activePlan.days[0];
+      const planExerciseEntries = selectedDay.exercises.map((exercise) => ({
+         id: `${Date.now()}-${exercise.exerciseIndex}-${Math.random().toString(36).slice(2, 6)}`,
+         name: exerciseNames[exercise.exerciseIndex] || `Exercise ${exercise.exerciseIndex}`,
+         details: null,
+         sets: Array.from({ length: exercise.sets }, (_, index) => ({
+            id: `${Date.now()}-${exercise.exerciseIndex}-${index}`,
+            reps: exercise.reps,
+            weight: exercise.defaultWeight ?? "",
+            notes: "",
+         })),
+      }));
+
+      saveExercisesForDay(today, planExerciseEntries as any);
+      setActivePage("exercise");
+   };
+
    return (
       <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
          {/* Heading */}
@@ -397,6 +439,14 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
                </button>
             )}
          </h2>
+
+         <ActivePlanWidget
+            activePlan={activePlan}
+            activeDayIndex={activePlanDayIndex}
+            onOpenPlanCatalog={handleOpenPlanCatalog}
+            onSelectDay={handleSelectDay}
+            onStartWorkout={handleStartWorkout}
+         />
 
          {/* Exercise Form */}
          <ExerciseForm

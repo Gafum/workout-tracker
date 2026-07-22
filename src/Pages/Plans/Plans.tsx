@@ -17,7 +17,7 @@ export const Plans: React.FC = () => {
    };
 
    return (
-      <div className="p-4 sm:p-6 bg-white rounded-xl shadow-md border border-gray-200">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
          <div className="mb-6">
             <h2 className="text-2xl font-semibold text-brand-green-dark">
                {t("plans.catalog_title")}

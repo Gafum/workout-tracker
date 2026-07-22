@@ -21,27 +21,20 @@ export const ActivePlanWidget: React.FC<IActivePlanWidgetProps> = ({
 
    if (!activePlan) {
       return (
-         <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 mb-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-               <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">
-                     {t("plans.widget_heading")}
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold text-brand-text">
-                     {t("plans.no_active_plan_title")}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-gray-600 max-w-xl">
-                     {t("plans.no_active_plan_description")}
-                  </p>
-               </div>
-               <button
-                  type="button"
-                  onClick={onOpenPlanCatalog}
-                  className="inline-flex items-center justify-center rounded-full bg-brand-green px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-green-dark"
-               >
-                  {t("plans.select_workout_plan")}
-               </button>
-            </div>
+         <section className="mb-5 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5 flex flex-col items-center">
+            <p className="text-lg text-brand-green-dark text-left">
+               {t("plans.widget_heading")}
+            </p>
+            <h2 className="text-lg font-semibold text-brand-text">
+               {t("plans.no_active_plan_title")}
+            </h2>
+            <button
+               type="button"
+               onClick={onOpenPlanCatalog}
+               className="inline-flex items-center justify-center rounded-lg border border-brand-green bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark mt-3 w-60 max-w-[100%]"
+            >
+               {t("plans.select_workout_plan")}
+            </button>
          </section>
       );
    }
@@ -50,31 +43,28 @@ export const ActivePlanWidget: React.FC<IActivePlanWidgetProps> = ({
    const exerciseCount = selectedDay?.exercises.length ?? 0;
 
    return (
-      <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 mb-6">
+      <section className="mb-5 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">
+               <p className="text-lg text-brand-green-dark text-left">
                   {t("plans.active_plan_label")}
                </p>
-               <h2 className="mt-2 text-xl font-semibold text-brand-text">
+               <h2 className="mt-1 text-lg font-semibold text-brand-text">
                   {t(activePlan.titleKey)}
                </h2>
-               <p className="mt-2 text-sm leading-6 text-gray-600 max-w-xl">
-                  {t(activePlan.descriptionKey)}
-               </p>
             </div>
-            <div className="rounded-2xl bg-brand-green/10 px-4 py-3 text-sm font-medium text-brand-green">
+            <div className="rounded-lg bg-brand-green/10 px-3 py-2 text-sm w-max font-medium text-brand-green">
                {activePlan.days.length} {t("plans.days")}
             </div>
          </div>
 
-         <div className="mt-5 flex flex-wrap gap-2">
+         <div className="mt-4 flex flex-wrap gap-2">
             {activePlan.days.map((day, index) => (
                <button
                   key={day.dayId}
                   type="button"
                   onClick={() => onSelectDay(index)}
-                  className={`rounded-full border px-4 py-2 text-sm font-medium transition ${index === activeDayIndex
+                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${index === activeDayIndex
                      ? "border-brand-green bg-brand-green text-white"
                      : "border-gray-200 bg-white text-gray-700 hover:border-brand-green hover:text-brand-green"
                      }`}
@@ -84,22 +74,17 @@ export const ActivePlanWidget: React.FC<IActivePlanWidgetProps> = ({
             ))}
          </div>
 
-         <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-               <p className="text-sm text-gray-500">
-                  {t("plans.day_summary", {
-                     count: exerciseCount,
-                     day: t(selectedDay.dayNameKey),
-                  })}
-               </p>
-               <p className="mt-2 text-sm leading-6 text-gray-600">
-                  {t("plans.plan_instruction")}
-               </p>
-            </div>
+         <div className="mt-2 flex flex-col items-left gap-1">
+            <p className="text-sm text-gray-500">
+               {t("plans.day_summary", {
+                  count: exerciseCount,
+                  day: t(selectedDay.dayNameKey),
+               })}
+            </p>
             <button
                type="button"
                onClick={onStartWorkout}
-               className="inline-flex items-center justify-center rounded-full bg-brand-green px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-green-dark"
+               className="inline-flex items-center justify-center rounded-lg border border-brand-green bg-brand-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-green-dark mt-3 w-80 max-w-[100%]"
             >
                {t("plans.start_todays_workout")}
             </button>
