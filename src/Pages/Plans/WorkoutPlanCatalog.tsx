@@ -1,15 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { useLanguage } from "../Context/LanguageContext";
-import { POPULAR_EXERCISES } from "../locales/PopularExercises/PopularExercises";
-import { IWorkoutPlan, IPlanExercise } from "../Types/plan";
-import { PRESET_WORKOUT_PLANS } from "../constants/presetPlans";
-
-interface IWorkoutPlanCatalogProps {
-   activePlanId?: string | null;
-   customPlans: IWorkoutPlan[];
-   onSetActivePlan: (planId: string | null) => void;
-   onSaveCustomPlans: (plans: IWorkoutPlan[]) => void;
-}
+import { useLanguage } from "../../Context/LanguageContext";
+import { POPULAR_EXERCISES } from "../../locales/PopularExercises/PopularExercises";
+import { IWorkoutPlan, IPlanExercise } from "../../Types/plan";
+import { PRESET_WORKOUT_PLANS } from "../../constants/presetPlans";
+import { useAppContext } from "../../Context/AppContext";
 
 const createEmptyPlan = (): IWorkoutPlan => ({
    id: `custom-${Date.now()}`,
@@ -29,13 +23,15 @@ const createEmptyPlan = (): IWorkoutPlan => ({
 const formatPlanTitle = (plan: IWorkoutPlan, t: (key: string) => string) =>
    plan.titleKey.startsWith("plans.") ? t(plan.titleKey) : plan.titleKey;
 
-export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
-   activePlanId,
-   customPlans,
-   onSetActivePlan,
-   onSaveCustomPlans,
-}) => {
+export const WorkoutPlanCatalog: React.FC = () => {
    const { t, language } = useLanguage();
+   const {
+      activePlanId,
+      setActivePlanId,
+      customPlans,
+      saveCustomPlans: onSaveCustomPlans,
+   } = useAppContext();
+
    const exerciseNames =
       POPULAR_EXERCISES[language as keyof typeof POPULAR_EXERCISES] ||
       POPULAR_EXERCISES.en;
@@ -62,9 +58,9 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
    // Активація / Деактивація плану
    const handleToggleActivePlan = (planId: string) => {
       if (activePlanId === planId) {
-         onSetActivePlan(null); // Деактивувати
+         setActivePlanId(null); // Деактивувати
       } else {
-         onSetActivePlan(planId); // Активувати
+         setActivePlanId(planId); // Активувати
       }
    };
 
@@ -202,6 +198,11 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
 
    return (
       <div className="space-y-6 py-2">
+         {/* Page header */}
+         <div className="mb-2">
+            <h1 className="text-2xl font-bold text-brand-text">{t("plans.catalog_title")}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t("plans.catalog_subtitle")}</p>
+         </div>
 
          <div className="space-y-4">
             {allPlans.map((plan) => {
@@ -225,7 +226,7 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
                               </h2>
                               {plan.isCustom && (
                                  <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                    Custom
+                                    {t("plans.custom_badge")}
                                  </span>
                               )}
                            </div>
@@ -373,7 +374,7 @@ export const WorkoutPlanCatalog: React.FC<IWorkoutPlanCatalogProps> = ({
                      }}
                      className="text-sm text-gray-500 hover:text-gray-700"
                   >
-                     Cancel Edit
+                     {t("cancel")}
                   </button>
                )}
             </div>

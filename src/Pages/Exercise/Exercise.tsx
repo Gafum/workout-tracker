@@ -13,7 +13,7 @@ import { IExerciseSet, IExerciseEntry } from "../../Types/AppTypes";
 import { de, enUS, Locale, ru, uk } from "date-fns/locale";
 import { ExerciseForm } from "../../Components/ExerciseForm/ExerciseForm";
 import { ImportModal } from "../../Components/ExercisePage/ImportModal";
-import { ActivePlanWidget } from "../../Components/ActivePlanWidget";
+import { ActivePlanWidget } from "../../Components/ExercisePage/ActivePlanWidget";
 import { POPULAR_EXERCISES } from "../../locales/PopularExercises/PopularExercises";
 import { useAppContext } from "../../Context/AppContext";
 
@@ -378,7 +378,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          return;
       }
 
-      const today = new Date();
+      // Use the day selected in the widget (activePlanDayIndex), save to the currently selected calendar date
       const selectedDay = activePlan.days[activePlanDayIndex] || activePlan.days[0];
       const planExerciseEntries = selectedDay.exercises.map((exercise) => ({
          id: `${Date.now()}-${exercise.exerciseIndex}-${Math.random().toString(36).slice(2, 6)}`,
@@ -392,8 +392,9 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
          })),
       }));
 
-      saveExercisesForDay(today, planExerciseEntries as any);
-      setActivePage("exercise");
+      // Save to selected calendar date and update local state immediately (no refresh needed)
+      saveExercisesForDay(selectedDate, planExerciseEntries as any);
+      setDailyExercises(planExerciseEntries as any);
    };
 
    return (

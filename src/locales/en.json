@@ -145,6 +145,7 @@
    "plans.delete_custom_plan": "Delete Plan",
    "plans.plan_preview": "Plan Preview",
    "plans.custom_plan_builder": "Custom Plan Builder",
+   "plans.custom_badge": "Custom",
    "plans.custom_plan_builder_description": "Build a custom plan with preset exercises and save it for later.",
    "plans.custom_plan_title": "Plan Title",
    "plans.custom_plan_description": "Plan Description",

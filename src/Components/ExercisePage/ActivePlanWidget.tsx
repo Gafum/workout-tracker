@@ -1,6 +1,6 @@
 import React from "react";
-import { IWorkoutPlan } from "../Types/plan";
-import { useLanguage } from "../Context/LanguageContext";
+import { IWorkoutPlan } from "../../Types/plan";
+import { useLanguage } from "../../Context/LanguageContext";
 
 interface IActivePlanWidgetProps {
    activePlan?: IWorkoutPlan | null;

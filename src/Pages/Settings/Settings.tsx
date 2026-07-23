@@ -31,7 +31,7 @@ export const Settings: React.FC = () => {
       loadUnitPreferences()
    );
    const { language: currentLanguage, setLanguage, t, getDateLocale } = useLanguage();
-   const { activePlanId, setActivePlanId, setActivePlanDayIndex } = useAppContext();
+   const { activePlanId, activePlan, setActivePlanId, setActivePlanDayIndex } = useAppContext();
 
    useEffect(() => {
       loadExerciseNames();
@@ -266,27 +266,54 @@ export const Settings: React.FC = () => {
             </select>
          </div>
 
-         <div className="mb-6 rounded-2xl border border-brand-border bg-brand-green/5 p-4">
-            <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
-               {t("plans.settings_title")}
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-               {t("plans.settings_description")}
-            </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-               <button
-                  type="button"
-                  onClick={() => setActivePlanId(null)}
-                  className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
-               >
-                  {t("plans.clear_active_plan")}
-               </button>
+         <div className="mb-6 overflow-hidden rounded-2xl border border-brand-green/20 bg-gradient-to-br from-brand-green/5 to-brand-green/10 shadow-sm">
+            {/* Header row */}
+            <div className="flex items-center gap-3 border-b border-brand-green/10 bg-white/60 px-5 py-4">
+               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+               </div>
+               <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-brand-text leading-tight">
+                     {t("plans.settings_title")}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-gray-500 leading-tight">
+                     {t("plans.settings_description")}
+                  </p>
+               </div>
             </div>
-            {activePlanId && (
-               <p className="mt-3 text-sm text-gray-700">
-                  {t("plans.current_active_plan")}: {activePlanId}
-               </p>
-            )}
+
+            {/* Body */}
+            <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+               {/* Active plan badge */}
+               <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${activePlan ? "bg-brand-green text-white" : "bg-gray-200 text-gray-500"}`}>
+                     {activePlan ? (
+                        <>
+                           <span className="h-2 w-2 rounded-full bg-white/70 animate-pulse" />
+                           {activePlan.titleKey.startsWith("plans.") ? t(activePlan.titleKey) : activePlan.titleKey}
+                        </>
+                     ) : (
+                        t("plans.no_active_plan_title")
+                     )}
+                  </span>
+               </div>
+
+               {/* Clear button — only visible if there's an active plan */}
+               {activePlanId && (
+                  <button
+                     type="button"
+                     onClick={() => setActivePlanId(null)}
+                     className="inline-flex items-center gap-1.5 self-start rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 sm:self-auto"
+                  >
+                     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                     </svg>
+                     {t("plans.clear_active_plan")}
+                  </button>
+               )}
+            </div>
          </div>
 
          <div className="mb-6">
