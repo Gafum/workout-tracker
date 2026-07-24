@@ -31,12 +31,17 @@ export const Settings: React.FC = () => {
       loadUnitPreferences()
    );
    const { language: currentLanguage, setLanguage, t, getDateLocale } = useLanguage();
-   const { activePlanId, activePlan, setActivePlanId, setActivePlanDayIndex } = useAppContext();
+   const { activePlanId, activePlan, setActivePlanId, setActivePage } = useAppContext();
+
 
    useEffect(() => {
       loadExerciseNames();
       setUnitPreferences(loadUnitPreferences());
    }, []);
+
+   const handleOpenPlanCatalog = () => {
+      setActivePage("plans");
+   };
 
    const loadExerciseNames = () => {
       const names = getAllExerciseNames();
@@ -250,7 +255,66 @@ export const Settings: React.FC = () => {
             )}
          </div>
 
-         <div className="mb-6">
+         {/* Active Plans */}
+         <div className="mb-6 border-b border-gray-200 pb-6">
+            <div className="mb-3">
+               <h3 className="text-base sm:text-lg font-semibold text-brand-text">
+                  {t("plans.settings_title")}
+               </h3>
+               <p className="text-xs text-gray-500 mt-0.5">
+                  {t("plans.settings_description")}
+               </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+               <div className="flex items-center gap-2">
+                  <span
+                     onClick={handleOpenPlanCatalog}
+                     className={`w-full sm:w-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-center justify-center ${activePlan
+                        ? "bg-brand-green text-white shadow-sm"
+                        : "bg-gray-200 text-gray-600"
+                        }`}
+                  >
+                     {activePlan ? (
+                        <>
+                           <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                           {activePlan.titleKey.startsWith("plans.")
+                              ? t(activePlan.titleKey)
+                              : activePlan.titleKey}
+                        </>
+                     ) : (
+                        t("plans.no_active_plan_title")
+                     )}
+                  </span>
+               </div>
+
+               {activePlanId && (
+                  <button
+                     type="button"
+                     onClick={() => setActivePlanId(null)}
+                     className=" w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-red-200 bg-white text-xs font-medium text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors self-start sm:self-auto"
+                  >
+                     <svg
+                        className="h-3.5 w-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                     >
+                        <path
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           strokeWidth="2"
+                           d="M6 18L18 6M6 6l12 12"
+                        />
+                     </svg>
+                     {t("plans.clear_active_plan")}
+                  </button>
+               )}
+            </div>
+         </div>
+
+         {/* Language */}
+         <div className="mb-6 border-b border-gray-200 pb-6">
             <h3 className="text-lg font-semibold mb-3">{t("language")}</h3>
             <select
                value={currentLanguage}
@@ -266,56 +330,7 @@ export const Settings: React.FC = () => {
             </select>
          </div>
 
-         <div className="mb-6 overflow-hidden rounded-2xl border border-brand-green/20 bg-gradient-to-br from-brand-green/5 to-brand-green/10 shadow-sm">
-            {/* Header row */}
-            <div className="flex items-center gap-3 border-b border-brand-green/10 bg-white/60 px-5 py-4">
-               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-               </div>
-               <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-brand-text leading-tight">
-                     {t("plans.settings_title")}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-gray-500 leading-tight">
-                     {t("plans.settings_description")}
-                  </p>
-               </div>
-            </div>
-
-            {/* Body */}
-            <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-               {/* Active plan badge */}
-               <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${activePlan ? "bg-brand-green text-white" : "bg-gray-200 text-gray-500"}`}>
-                     {activePlan ? (
-                        <>
-                           <span className="h-2 w-2 rounded-full bg-white/70 animate-pulse" />
-                           {activePlan.titleKey.startsWith("plans.") ? t(activePlan.titleKey) : activePlan.titleKey}
-                        </>
-                     ) : (
-                        t("plans.no_active_plan_title")
-                     )}
-                  </span>
-               </div>
-
-               {/* Clear button — only visible if there's an active plan */}
-               {activePlanId && (
-                  <button
-                     type="button"
-                     onClick={() => setActivePlanId(null)}
-                     className="inline-flex items-center gap-1.5 self-start rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 sm:self-auto"
-                  >
-                     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                     </svg>
-                     {t("plans.clear_active_plan")}
-                  </button>
-               )}
-            </div>
-         </div>
-
+         {/* Exercises */}
          <div className="mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3">
                {t("saved_exercises")}
@@ -382,26 +397,30 @@ export const Settings: React.FC = () => {
             )}
          </div>
 
-         {showEditModal && (
-            <EditExerciseModal
-               exercise={selectedExercise}
-               newName={newExerciseName}
-               setNewName={setNewExerciseName}
-               onSave={handleSaveEdit}
-               onCancel={() => setShowEditModal(false)}
-               title={t('edit_exercise_modal_title')}
-            />
-         )}
+         {
+            showEditModal && (
+               <EditExerciseModal
+                  exercise={selectedExercise}
+                  newName={newExerciseName}
+                  setNewName={setNewExerciseName}
+                  onSave={handleSaveEdit}
+                  onCancel={() => setShowEditModal(false)}
+                  title={t('edit_exercise_modal_title')}
+               />
+            )
+         }
 
-         {showDeleteModal && (
-            <DeleteExerciseModal
-               exercise={selectedExercise}
-               onConfirm={handleConfirmDelete}
-               onCancel={() => setShowDeleteModal(false)}
-               title={t('delete_exercise_modal_title')}
-               confirmationMessage={t('delete_exercise_confirmation', { exercise: selectedExercise })}
-            />
-         )}
-      </div>
+         {
+            showDeleteModal && (
+               <DeleteExerciseModal
+                  exercise={selectedExercise}
+                  onConfirm={handleConfirmDelete}
+                  onCancel={() => setShowDeleteModal(false)}
+                  title={t('delete_exercise_modal_title')}
+                  confirmationMessage={t('delete_exercise_confirmation', { exercise: selectedExercise })}
+               />
+            )
+         }
+      </div >
    );
 };
