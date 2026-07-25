@@ -154,6 +154,18 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
       }
    };
 
+   const handleClearAllExercises = () => {
+      if (dailyExercises.length === 0) return;
+
+      const confirmMessage = t("confirm_delete_all_exercises") || "Ви впевнені, що хочете видалити всі вправи на цей день?";
+      if (window.confirm(confirmMessage)) {
+         setDailyExercises([]);
+         saveExercisesForDay(selectedDate, []);
+         setEditingExercise(null);
+         setFormKey(`new-${Date.now()}`);
+      }
+   };
+
    const handleCancelEdit = () => {
       setEditingExercise(null);
       // Also change the key on cancel to reset the form
@@ -469,6 +481,7 @@ export const Exercise: React.FC<IExerciseProps> = ({ selectedDate }) => {
 
          {/* Use the new LoggedExerciseList component */}
          <LoggedExerciseList
+            onDeleteAllExercises={handleClearAllExercises}
             exercises={dailyExercises}
             onEditExercise={handleEditExercise}
             onDeleteExercise={handleDeleteExercise}

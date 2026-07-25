@@ -135,6 +135,7 @@
    "update_exercise": "Обновить упражнение",
    "add_exercise": "Добавить упражнение",
    "delete_set": "Удалить подход",
+   "delete_all": "Удалить все",
    "notes": "Заметки",
    "notes_placeholder": "Заметки (напр., EZ-гриф, удержание 10с)",
    "confirm_deletion": "Подтверждение удаления",

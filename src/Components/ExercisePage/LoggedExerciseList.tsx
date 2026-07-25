@@ -8,6 +8,7 @@ interface ILoggedExerciseListProps {
    exercises: IExerciseEntry[];
    onEditExercise: (id: string) => void;
    onDeleteExercise: (id: string) => void;
+   onDeleteAllExercises: () => void;
    isEditingAnyExercise: boolean;
    onReorderExercises?: (reorderedExercises: IExerciseEntry[]) => void;
 }
@@ -16,6 +17,7 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    exercises,
    onEditExercise,
    onDeleteExercise,
+   onDeleteAllExercises,
    isEditingAnyExercise,
    onReorderExercises,
 }) => {
@@ -30,20 +32,16 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    useEffect(() => {
       if (!listRef.current || exercises.length === 0) return;
 
-
       const sortable = new Sortable(listRef.current, {
          handle: ".drag-handle",
          animation: 200,
-
 
          scroll: true,
          scrollSensitivity: 140,
          scrollSpeed: 22,
          bubbleScroll: true,
 
-
          ghostClass: "opacity-20",
-
 
          forceFallback: true,
          fallbackClass: "shadow-2xl",
@@ -81,19 +79,44 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
 
    return (
       <div className="mt-6 sm:mt-8">
-         <h3 className="text-base sm:text-lg font-semibold text-brand-text mb-3 sm:mb-4">
-            {t("logged_exercises")}
-         </h3>
+         <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-brand-text">
+               {t("logged_exercises")}
+            </h3>
+
+            {exercises.length > 0 && (
+               <button
+                  type="button"
+                  onClick={onDeleteAllExercises}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                  title={t("delete_all") || "Delete all"}
+               >
+                  <svg
+                     xmlns="http://www.w3.org/2000/svg"
+                     className="h-3.5 w-3.5"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                  >
+                     <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                     />
+                  </svg>
+                  <span>{t("delete_all") || "Видалити все"}</span>
+               </button>
+            )}
+         </div>
 
          <div ref={listRef} className="space-y-3 sm:space-y-4">
             {exercises.map((exercise) => (
-
                <div
                   key={exercise.id}
                   data-id={exercise.id}
                   className="select-none bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm flex items-center"
                >
-
                   <div
                      className="drag-handle text-gray-400 hover:text-gray-600 p-2 mr-2 cursor-grab active:cursor-grabbing touch-none flex-shrink-0 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
                      title={t("drag_to_reorder")}
