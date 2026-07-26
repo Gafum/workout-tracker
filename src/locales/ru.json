@@ -156,7 +156,7 @@
    "plans.catalog_subtitle": "Просматривайте готовые планы или создайте свой сплит.",
    "plans.catalog_description": "Выберите структуру тренировок и активируйте её. Используйте собственные планы для идеального недельного расписания.",
    "plans.active_label": "Активный",
-   "plans.set_active_plan": "Сделать активным",
+   "plans.set_active_plan": "Активировать",
    "plans.view_details": "Просмотреть детали",
    "plans.create_custom_plan": "Создать собственный план",
    "plans.edit_custom_plan": "Редактировать план",

@@ -17,8 +17,6 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    exercise,
    onEdit,
    onDelete,
-   isDraggable = false,
-   dragHandleProps
 }) => {
    const { t } = useLanguage();
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -89,23 +87,14 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
    return (
       <>
          <div
-            className="group bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-150 ease-in-out"
+            key={exercise.id}
+            data-id={exercise.id}
+            className="select-none bg-white border border-gray-200 rounded-lg p-3 sm:p-4 pr-1.5 shadow-sm flex items-center"
          >
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-grow min-w-0">
                {/* TOP ROW: Headline + Desktop Buttons */}
                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                   <h4 className="text-md sm:text-lg font-semibold text-brand-green-dark break-words mb-2 sm:mb-0 flex-grow flex items-center">
-                     {isDraggable && (
-                        <span
-                           className="drag-handle mr-3 text-gray-400 cursor-grab active:cursor-grabbing p-2 -ml-2 rounded-md hover:bg-gray-100 touch-none flex items-center justify-center"
-                           title={t("drag_to_reorder")}
-                           {...dragHandleProps}
-                        >
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                           </svg>
-                        </span>
-                     )}
                      <span className="flex-grow">{exercise.name}</span>
                   </h4>
 
@@ -161,6 +150,20 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                   <EditButton />
                   <DeleteButton />
                </div>
+            </div>
+            <div
+               className="drag-handle touch-none cursor-grab active:cursor-grabbing flex-shrink-0 self-stretch flex items-center justify-center sm:pl-3 pl-1.5 text-gray-300"
+               title={t("drag_to_reorder")}
+            >
+               {/* 6 компактних крапок заместь довгої іконки */}
+               <svg className="h-4 w-2 pointer-events-none" viewBox="0 0 8 16" fill="currentColor">
+                  <circle cx="2" cy="2" r="1.5" />
+                  <circle cx="6" cy="2" r="1.5" />
+                  <circle cx="2" cy="8" r="1.5" />
+                  <circle cx="6" cy="8" r="1.5" />
+                  <circle cx="2" cy="14" r="1.5" />
+                  <circle cx="6" cy="14" r="1.5" />
+               </svg>
             </div>
          </div>
 

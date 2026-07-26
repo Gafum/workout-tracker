@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useMemo } from 'react';
 import {
-  getAllWorkoutPlans,
   loadActivePlanDayIndex,
   loadActivePlanId,
   loadSavedCustomPlans,
@@ -9,6 +8,7 @@ import {
   saveCustomPlans,
 } from '../Utils/planUtils';
 import { IWorkoutPlan } from '../Types/plan';
+import { PRESET_WORKOUT_PLANS } from "../constants/presetPlans";
 
 type AppPage = 'exercise' | 'weight' | 'settings' | 'plans';
 
@@ -44,7 +44,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [activePlanDayIndex, setActivePlanDayIndex] = useState<number>(loadActivePlanDayIndex());
   const [customPlans, setCustomPlansState] = useState<IWorkoutPlan[]>(loadSavedCustomPlans());
 
-  const allPlans = useMemo(() => getAllWorkoutPlans(), [customPlans]);
+
+  const allPlans = useMemo(
+    () => [...PRESET_WORKOUT_PLANS, ...customPlans],
+    [customPlans]
+  );
   const activePlan = useMemo(
     () => allPlans.find((plan) => plan.id === activePlanId),
     [allPlans, activePlanId]

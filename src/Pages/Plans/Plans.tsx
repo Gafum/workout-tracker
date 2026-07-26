@@ -215,10 +215,10 @@ export const Plans: React.FC = () => {
                      className={`rounded-xl border bg-white transition shadow-sm ${isActive ? "border-brand-green ring-1 ring-brand-green/30" : "border-gray-200"
                         }`}
                   >
-                     <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                     <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5" onClick={() => toggleExpandPlan(plan.id)}>
                         <div
                            className="flex-1 cursor-pointer"
-                           onClick={() => toggleExpandPlan(plan.id)}
+
                         >
                            <div className="flex items-center gap-2">
                               <h2 className="text-lg font-semibold text-brand-text">
@@ -236,13 +236,39 @@ export const Plans: React.FC = () => {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
+                           {plan.isCustom && (
+                              <div className="flex items-center gap-1">
+                                 <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); handleEditCustomPlan(plan); }}
+                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-brand-green"
+                                    title={t("plans.edit_custom_plan")}
+                                 >
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                 </button>
+                                 <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteCustomPlan(plan.id); }}
+                                    className="rounded-lg p-2 text-red-500 hover:bg-red-50"
+                                    title={t("plans.delete_custom_plan")}
+                                 >
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                 </button>
+                              </div>
+                           )}
+
+
                            <span className="rounded-full bg-brand-green/10 px-3 py-1 text-xs font-semibold text-brand-green">
                               {plan.days.length} {t("plans.days")}
                            </span>
 
                            <button
                               type="button"
-                              onClick={() => handleToggleActivePlan(plan.id)}
+                              onClick={(e) => { e.stopPropagation(); handleToggleActivePlan(plan.id); }}
                               title={isActive ? t("plans.active_label") : t("plans.set_active_plan")}
                               className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${isActive
                                  ? "bg-brand-green text-white hover:bg-red-600"
@@ -268,34 +294,9 @@ export const Plans: React.FC = () => {
                               )}
                            </button>
 
-                           {plan.isCustom && (
-                              <div className="flex items-center gap-1">
-                                 <button
-                                    type="button"
-                                    onClick={() => handleEditCustomPlan(plan)}
-                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-brand-green"
-                                    title={t("plans.edit_custom_plan")}
-                                 >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                 </button>
-                                 <button
-                                    type="button"
-                                    onClick={() => handleDeleteCustomPlan(plan.id)}
-                                    className="rounded-lg p-2 text-red-500 hover:bg-red-50"
-                                    title={t("plans.delete_custom_plan")}
-                                 >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                 </button>
-                              </div>
-                           )}
 
                            <button
                               type="button"
-                              onClick={() => toggleExpandPlan(plan.id)}
                               className="hidden sm:block rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                            >
                               <svg
@@ -529,6 +530,6 @@ export const Plans: React.FC = () => {
                </div>
             </div>
          </section>
-      </div>
+      </div >
    );
 };

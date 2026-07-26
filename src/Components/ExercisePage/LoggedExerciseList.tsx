@@ -112,29 +112,12 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
 
          <div ref={listRef} className="space-y-3 sm:space-y-4">
             {exercises.map((exercise) => (
-               <div
-                  key={exercise.id}
-                  data-id={exercise.id}
-                  className="select-none bg-white border border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm flex items-center"
-               >
-                  <div
-                     className="drag-handle text-gray-400 hover:text-gray-600 p-2 mr-2 cursor-grab active:cursor-grabbing touch-none flex-shrink-0 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
-                     title={t("drag_to_reorder")}
-                  >
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
-                     </svg>
-                  </div>
-
-                  <div className="flex-grow min-w-0">
-                     <LoggedExerciseItem
-                        exercise={exercise}
-                        onEdit={onEditExercise}
-                        onDelete={onDeleteExercise}
-                        isDraggable={false}
-                     />
-                  </div>
-               </div>
+               <LoggedExerciseItem
+                  exercise={exercise}
+                  onEdit={onEditExercise}
+                  onDelete={onDeleteExercise}
+                  isDraggable={false}
+               />
             ))}
          </div>
       </div>
