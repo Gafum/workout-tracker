@@ -152,10 +152,9 @@ export const LoggedExerciseItem: React.FC<ILoggedExerciseItemProps> = ({
                </div>
             </div>
             <div
-               className="drag-handle touch-none cursor-grab active:cursor-grabbing flex-shrink-0 self-stretch flex items-center justify-center sm:pl-3 pl-1.5 text-gray-300"
+               className="drag-handle touch-none cursor-grab active:cursor-grabbing sm:pl-3 pl-1.5 text-gray-300"
                title={t("drag_to_reorder")}
             >
-               {/* 6 компактних крапок заместь довгої іконки */}
                <svg className="h-4 w-2 pointer-events-none" viewBox="0 0 8 16" fill="currentColor">
                   <circle cx="2" cy="2" r="1.5" />
                   <circle cx="6" cy="2" r="1.5" />

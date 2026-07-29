@@ -36,6 +36,10 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
          handle: ".drag-handle",
          animation: 200,
 
+         delay: 300, // Чекати 200мс перед початком дрейгу
+         delayOnTouchOnly: true,
+         touchStartThreshold: 5,
+
          scroll: true,
          scrollSensitivity: 140,
          scrollSpeed: 22,
@@ -113,6 +117,7 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
          <div ref={listRef} className="space-y-3 sm:space-y-4">
             {exercises.map((exercise) => (
                <LoggedExerciseItem
+                  key={exercise.id}
                   exercise={exercise}
                   onEdit={onEditExercise}
                   onDelete={onDeleteExercise}
