@@ -36,23 +36,25 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
          handle: ".drag-handle",
          animation: 200,
 
-         delay: 300, // Чекати 200мс перед початком дрейгу
+         delay: 300,
          delayOnTouchOnly: true,
          touchStartThreshold: 5,
 
          scroll: true,
-         scrollSensitivity: 140,
-         scrollSpeed: 22,
+         scrollSensitivity: 300,
+         scrollSpeed: 120,
          bubbleScroll: true,
+         forceAutoScrollFallback: true,
 
          ghostClass: "opacity-20",
-
          forceFallback: true,
          fallbackClass: "shadow-2xl",
 
          onEnd: (evt) => {
-            const { oldIndex, newIndex } = evt;
+            const { oldIndex, newIndex, item } = evt;
             if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+            item.scrollIntoView({ behavior: "smooth", block: "center" });
 
             if (onReorderExercises) {
                const currentList = [...exercisesRef.current];
