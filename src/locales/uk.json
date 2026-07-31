@@ -227,5 +227,12 @@
    "plans.proTip.legExtension": "Контролюйте підйом, не блокуйте різко коліно.",
    "plans.proTip.legCurl": "Стегна притиснуті, стиснення підколінних угорі.",
    "plans.proTip.hangingLegRaise": "Підйом за рахунок кора, без маху.",
-   "delete_all": "Видалити всі"
+   "delete_all": "Видалити всі",
+   "no_data": "Немає даних",
+   "low": "Слабо",
+   "high": "Розвинено",
+   "muscle_map_title": "Розвиток м'язів",
+   "front_view": "Спереду",
+   "back_view": "Ззаду",
+   "save_progress": "Зберегти"
 }

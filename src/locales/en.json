@@ -217,5 +217,12 @@
    "plans.proTip.legExtension": "Control the lift and avoid locking the knee aggressively.",
    "plans.proTip.legCurl": "Keep the hips down and squeeze the hamstrings at the top.",
    "plans.proTip.hangingLegRaise": "Use the core to lift, not momentum.",
-   "delete_all": "Delete all"
+   "delete_all": "Delete all",
+   "no_data": "No data",
+   "low": "Low",
+   "high": "High",
+   "muscle_map_title": "Muscle Development",
+   "front_view": "Front",
+   "back_view": "Back",
+   "save_progress": "Save Progress"
 }

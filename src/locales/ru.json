@@ -227,5 +227,12 @@
    "plans.proTip.romanianDeadlift": "Шарнир в бёдрах, чувствуйте растяжение бицепса бедра.",
    "plans.proTip.legExtension": "Контролируйте подъём, не блокируйте резко колено.",
    "plans.proTip.legCurl": "Бёдра прижаты, сжатие бицепса бедра вверху.",
-   "plans.proTip.hangingLegRaise": "Подъём за счёт кора, без маха."
+   "plans.proTip.hangingLegRaise": "Подъём за счёт кора, без маха.",
+   "no_data": "Нет данных",
+   "low": "Слабо",
+   "high": "Развито",
+   "muscle_map_title": "Развитие мышц",
+   "front_view": "Спереди",
+   "back_view": "Сзади",
+   "save_progress": "Сохранить"
 }

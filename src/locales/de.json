@@ -226,5 +226,12 @@
    "plans.proTip.romanianDeadlift": "Aus der Hüfte beugen, Dehnung in den Oberschenkeln spüren.",
    "plans.proTip.legExtension": "Kontrolliert heben, Knie nicht aggressiv blockieren.",
    "plans.proTip.legCurl": "Hüften unten halten, Oberschenkel oben zusammendrücken.",
-   "plans.proTip.hangingLegRaise": "Core zum Heben verwenden, nicht Schwung."
+   "plans.proTip.hangingLegRaise": "Core zum Heben verwenden, nicht Schwung.",
+   "no_data": "Keine Daten",
+   "low": "Niedrig",
+   "high": "Hoch",
+   "muscle_map_title": "Muskelentwicklung",
+   "front_view": "Vorne",
+   "back_view": "Hinten",
+   "save_progress": "Speichern"
 }
