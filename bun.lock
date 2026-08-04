@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "sport-counter",
@@ -17,6 +18,7 @@
         "react-dom": "^19.0.0",
         "react-icons": "^5.5.0",
         "react-modal": "^3.16.3",
+        "react-muscle-highlighter": "^1.2.0",
         "recharts": "^2.15.3",
         "sortablejs": "^1.15.7",
       },
@@ -670,6 +672,8 @@
     "react-lifecycles-compat": ["react-lifecycles-compat@3.0.4", "", {}, "sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA=="],
 
     "react-modal": ["react-modal@3.16.3", "", { "dependencies": { "exenv": "^1.2.0", "prop-types": "^15.7.2", "react-lifecycles-compat": "^3.0.0", "warning": "^4.0.3" }, "peerDependencies": { "react": "^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18 || ^19", "react-dom": "^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18 || ^19" } }, "sha512-yCYRJB5YkeQDQlTt17WGAgFJ7jr2QYcWa1SHqZ3PluDmnKJ/7+tVU+E6uKyZ0nODaeEj+xCpK4LcSnKXLMC0Nw=="],
+
+    "react-muscle-highlighter": ["react-muscle-highlighter@1.2.0", "", { "peerDependencies": { "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-jyQOy0PH8sYt221VnQhejYZvJsqpKNzYzNmC9yt+CWJRf0qmegNSxDgSVT2wi90//Pdebm5xVvYjA2qxM2E3rg=="],
 
     "react-refresh": ["react-refresh@0.17.0", "", {}, "sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ=="],
 
