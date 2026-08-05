@@ -1,5 +1,5 @@
 import React from "react";
-import Model from "react-muscle-highlighter";
+import Body, { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 
 export type MuscleId =
    | "chest"
@@ -20,17 +20,17 @@ interface MuscleMapProps {
    emptyColor?: string;
 }
 
-// Мапінг ваших ключів на точні назви м me'язів (slug/name), які використовує бібліотека
-const MUSCLE_MAPPING: Record<MuscleId, string[]> = {
+// Строгий мапінг вашого MuscleId на офіційний тип Slug[]
+const MUSCLE_MAPPING: Record<MuscleId, Slug[]> = {
    chest: ["chest"],
    back: ["trapezius", "upper-back", "lower-back"],
-   shoulders: ["front-deltoids", "back-deltoids"],
-   biceps: ["biceps"],
+   shoulders: ["deltoids"],
+   biceps: ["biceps", "forearm"],
    triceps: ["triceps"],
    abs: ["abs", "obliques"],
    quads: ["quadriceps"],
    hamstrings: ["hamstring"],
-   calves: ["calves"],
+   calves: ["calves", "tibialis"],
    glutes: ["gluteal"],
 };
 
@@ -38,26 +38,27 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
    view,
    muscleColors,
    onMuscleClick,
-   emptyColor = "#475569",
+   emptyColor = "#334155", // Slate-700
 }) => {
-   // Формуємо масив об'єктів без суворого типу Muscle, використовуючи any/Record для сумісності з типами бібліотеки
-   const highlightedData = Object.entries(muscleColors).flatMap(([id]) => {
-      const mappedMuscles = MUSCLE_MAPPING[id as MuscleId];
-      if (!mappedMuscles) return [];
+   // Формуємо масив строго за типом ExtendedBodyPart[]
+   const bodyData: ExtendedBodyPart[] = Object.entries(muscleColors).flatMap(
+      ([id, color]) => {
+         const slugs = MUSCLE_MAPPING[id as MuscleId];
+         if (!slugs) return [];
 
-      return mappedMuscles.map((slug) => ({
-         name: slug,
-         slug: slug,
-         fill: muscleColors[id],
-      }));
-   });
+         return slugs.map((slug) => ({
+            slug,
+            color,
+         }));
+      },
+   );
 
-   // Обробник кліку по м'язу
-   const handleMuscleClick = (payload: any) => {
-      const clickedName = payload?.name || payload?.slug || payload;
+   // Типізований обробник кліку
+   const handleBodyPartPress = (bodyPart: ExtendedBodyPart) => {
+      if (!bodyPart.slug) return;
 
-      const foundEntry = Object.entries(MUSCLE_MAPPING).find(([_, muscles]) =>
-         muscles.includes(clickedName)
+      const foundEntry = Object.entries(MUSCLE_MAPPING).find(([_, slugs]) =>
+         slugs.includes(bodyPart.slug as Slug),
       );
 
       if (foundEntry) {
@@ -65,16 +66,17 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
       }
    };
 
-   const activeColor = Object.values(muscleColors)[0] || "#3b82f6";
-
    return (
-      <div className="flex w-full justify-center ">
-         <Model
-            side={view === "front" ? "front" : "back"}
-            data={highlightedData as any}
-            onBodyPartPress={handleMuscleClick}
+      <div className="flex w-full justify-center items-center p-2">
+         <Body
+            gender="male"
+            side={view}
+            data={bodyData}
+            onBodyPartPress={handleBodyPartPress}
             defaultFill={emptyColor}
-            colors={[activeColor]}
+            defaultStroke="#0f172a"
+            defaultStrokeWidth={1.5}
+            scale={1.1}
          />
       </div>
    );
