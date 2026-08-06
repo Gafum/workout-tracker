@@ -20,45 +20,55 @@ interface MuscleMapProps {
    emptyColor?: string;
 }
 
-// Строгий мапінг вашого MuscleId на офіційний тип Slug[]
+// Тільки ті м'язи, які реально є у вашому додатку і мають клікатись
 const MUSCLE_MAPPING: Record<MuscleId, Slug[]> = {
    chest: ["chest"],
    back: ["trapezius", "upper-back", "lower-back"],
    shoulders: ["deltoids"],
-   biceps: ["biceps", "forearm"],
+   biceps: ["biceps"],
    triceps: ["triceps"],
    abs: ["abs", "obliques"],
    quads: ["quadriceps"],
    hamstrings: ["hamstring"],
-   calves: ["calves", "tibialis"],
+   calves: ["calves"],
    glutes: ["gluteal"],
 };
+
+// Повний список усіх можливих частин тіла з бібліотеки
+const ALL_SLUGS: Slug[] = [
+   "abs", "adductors", "ankles", "biceps", "calves", "chest", "deltoids",
+   "feet", "forearm", "gluteal", "hamstring", "hands", "hair", "head",
+   "knees", "lower-back", "neck", "obliques", "quadriceps", "tibialis",
+   "trapezius", "triceps", "upper-back"
+];
+
+// Автоматично знаходжу всі "зайві" деталі (голова, шия, передпліччя, стопи і т.д.)
+const ACTIVE_SLUGS = Object.values(MUSCLE_MAPPING).flat();
+const NON_INTERACTIVE_SLUGS = ALL_SLUGS.filter((slug) => !ACTIVE_SLUGS.includes(slug));
 
 export const MuscleMap: React.FC<MuscleMapProps> = ({
    view,
    muscleColors,
    onMuscleClick,
-   emptyColor = "#334155", // Slate-700
+   emptyColor = "#334155", // Сірий колір для ваших м'язів, коли вони не вибрані
 }) => {
-   // Формуємо масив строго за типом ExtendedBodyPart[]
-   const bodyData: ExtendedBodyPart[] = Object.entries(muscleColors).flatMap(
-      ([id, color]) => {
-         const slugs = MUSCLE_MAPPING[id as MuscleId];
-         if (!slugs) return [];
+   // Формуємо масив даних тільки для активних м'язів
+   const bodyData: ExtendedBodyPart[] = Object.entries(muscleColors).flatMap(([id, color]) => {
+      const mappedSlugs = MUSCLE_MAPPING[id as MuscleId];
+      if (!mappedSlugs) return [];
 
-         return slugs.map((slug) => ({
-            slug,
-            color,
-         }));
-      },
-   );
+      return mappedSlugs.map((slug) => ({
+         slug,
+         color,
+      }));
+   });
 
-   // Типізований обробник кліку
+   // Обробка кліку (ігнорує всі зайві кліки)
    const handleBodyPartPress = (bodyPart: ExtendedBodyPart) => {
       if (!bodyPart.slug) return;
 
       const foundEntry = Object.entries(MUSCLE_MAPPING).find(([_, slugs]) =>
-         slugs.includes(bodyPart.slug as Slug),
+         slugs.includes(bodyPart.slug!)
       );
 
       if (foundEntry) {
@@ -67,16 +77,17 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
    };
 
    return (
-      <div className="flex w-full justify-center items-center p-2">
+      <div className="flex w-full justify-center items-center">
          <Body
             gender="male"
-            side={view}
+            side={view === "front" ? "front" : "back"}
             data={bodyData}
             onBodyPartPress={handleBodyPartPress}
+            disabledParts={NON_INTERACTIVE_SLUGS} // Усі дрібні/непотрібні деталі блокуються і стають просто суцільним фоном
             defaultFill={emptyColor}
-            defaultStroke="#0f172a"
-            defaultStrokeWidth={1.5}
-            scale={1.1}
+            defaultStroke="#0f172a" // Темний контур між блоками
+            defaultStrokeWidth={1}
+            border="none"
          />
       </div>
    );
