@@ -20,21 +20,20 @@ interface MuscleMapProps {
    emptyColor?: string;
 }
 
-// Тільки ті м'язи, які реально є у вашому додатку і мають клікатись
+// Об'єднуємо дрібні шматки в єдині понятні групи
 const MUSCLE_MAPPING: Record<MuscleId, Slug[]> = {
    chest: ["chest"],
-   back: ["trapezius", "upper-back", "lower-back"],
+   back: ["trapezius", "upper-back", "lower-back"], // Всі 3 частини зіллються в один блок спини
    shoulders: ["deltoids"],
    biceps: ["biceps"],
    triceps: ["triceps"],
-   abs: ["abs", "obliques"],
+   abs: ["abs", "obliques"], // Прес і боки зливаються в один кубик/блок
    quads: ["quadriceps"],
    hamstrings: ["hamstring"],
    calves: ["calves"],
    glutes: ["gluteal"],
 };
 
-// Повний список усіх можливих частин тіла з бібліотеки
 const ALL_SLUGS: Slug[] = [
    "abs", "adductors", "ankles", "biceps", "calves", "chest", "deltoids",
    "feet", "forearm", "gluteal", "hamstring", "hands", "hair", "head",
@@ -42,17 +41,16 @@ const ALL_SLUGS: Slug[] = [
    "trapezius", "triceps", "upper-back"
 ];
 
-// Автоматично знаходжу всі "зайві" деталі (голова, шия, передпліччя, стопи і т.д.)
 const ACTIVE_SLUGS = Object.values(MUSCLE_MAPPING).flat();
-const NON_INTERACTIVE_SLUGS = ALL_SLUGS.filter((slug) => !ACTIVE_SLUGS.includes(slug));
+// Всі сірі дрібниці (голова, шия, передпліччя) повністю видаляються з екрану
+const HIDDEN_SLUGS = ALL_SLUGS.filter((slug) => !ACTIVE_SLUGS.includes(slug));
 
 export const MuscleMap: React.FC<MuscleMapProps> = ({
    view,
    muscleColors,
    onMuscleClick,
-   emptyColor = "#334155", // Сірий колір для ваших м'язів, коли вони не вибрані
+   emptyColor = "#334155",
 }) => {
-   // Формуємо масив даних тільки для активних м'язів
    const bodyData: ExtendedBodyPart[] = Object.entries(muscleColors).flatMap(([id, color]) => {
       const mappedSlugs = MUSCLE_MAPPING[id as MuscleId];
       if (!mappedSlugs) return [];
@@ -63,7 +61,6 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
       }));
    });
 
-   // Обробка кліку (ігнорує всі зайві кліки)
    const handleBodyPartPress = (bodyPart: ExtendedBodyPart) => {
       if (!bodyPart.slug) return;
 
@@ -83,10 +80,9 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
             side={view === "front" ? "front" : "back"}
             data={bodyData}
             onBodyPartPress={handleBodyPartPress}
-            disabledParts={NON_INTERACTIVE_SLUGS} // Усі дрібні/непотрібні деталі блокуються і стають просто суцільним фоном
+            hiddenParts={HIDDEN_SLUGS}
             defaultFill={emptyColor}
-            defaultStroke="#0f172a" // Темний контур між блоками
-            defaultStrokeWidth={1}
+            defaultStroke="none"
             border="none"
          />
       </div>
