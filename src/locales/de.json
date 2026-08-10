@@ -233,5 +233,15 @@
    "muscle_map_title": "Muskelentwicklung",
    "front_view": "Vorne",
    "back_view": "Hinten",
-   "save_progress": "Speichern"
+   "save_progress": "Speichern",
+   "muscle_chest": "Brust",
+   "muscle_back": "Rücken",
+   "muscle_shoulders": "Schultern",
+   "muscle_biceps": "Bizeps",
+   "muscle_triceps": "Trizeps",
+   "muscle_abs": "Bauchmuskeln",
+   "muscle_quads": "Quadrizeps",
+   "muscle_hamstrings": "Beinbeuger",
+   "muscle_calves": "Waden",
+   "muscle_glutes": "Gesäß"
 }

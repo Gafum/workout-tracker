@@ -224,5 +224,15 @@
    "muscle_map_title": "Muscle Development",
    "front_view": "Front",
    "back_view": "Back",
-   "save_progress": "Save Progress"
+   "save_progress": "Save Progress",
+   "muscle_chest": "Chest",
+   "muscle_back": "Back",
+   "muscle_shoulders": "Shoulders",
+   "muscle_biceps": "Biceps",
+   "muscle_triceps": "Triceps",
+   "muscle_abs": "Abs",
+   "muscle_quads": "Quadriceps",
+   "muscle_hamstrings": "Hamstrings",
+   "muscle_calves": "Calves",
+   "muscle_glutes": "Glutes"
 }

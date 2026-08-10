@@ -234,5 +234,15 @@
    "muscle_map_title": "Розвиток м'язів",
    "front_view": "Спереду",
    "back_view": "Ззаду",
-   "save_progress": "Зберегти"
+   "save_progress": "Зберегти",
+   "muscle_chest": "Груди",
+   "muscle_back": "Спина",
+   "muscle_shoulders": "Плечі",
+   "muscle_biceps": "Біцепс",
+   "muscle_triceps": "Трицепс",
+   "muscle_abs": "Прес",
+   "muscle_quads": "Квадрицепс",
+   "muscle_hamstrings": "Біцепс стегна",
+   "muscle_calves": "Литки",
+   "muscle_glutes": "Сідниці"
 }

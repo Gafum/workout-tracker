@@ -234,5 +234,15 @@
    "muscle_map_title": "Развитие мышц",
    "front_view": "Спереди",
    "back_view": "Сзади",
-   "save_progress": "Сохранить"
+   "save_progress": "Сохранить",
+   "muscle_chest": "Грудь",
+   "muscle_back": "Спина",
+   "muscle_shoulders": "Плечи",
+   "muscle_biceps": "Бицепс",
+   "muscle_triceps": "Трицепс",
+   "muscle_abs": "Пресс",
+   "muscle_quads": "Квадрицепс",
+   "muscle_hamstrings": "Бицепс бедра",
+   "muscle_calves": "Икры",
+   "muscle_glutes": "Ягодицы"
 }

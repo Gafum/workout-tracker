@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWeightFood } from "../../Hooks/useWeightFood";
 import { getBmiColor } from "../../Utils/metricDisplayUtils";
 import WeightChart from "../../Components/WeightFoodPage/WeightChart";
@@ -22,10 +22,6 @@ const MUSCLE_EXERCISES: Record<MuscleId, number[]> = {
 type MuscleSet = { w: string; r: string }[];
 type MuscleStats = Partial<Record<MuscleId, MuscleSet>>;
 
-/* ============================================================================
-   ЛОГІКА КОЛЬОРІВ (Об'єм = Вага * Повторення)
-============================================================================ */
-
 function computeMuscleScore(stats?: MuscleSet): number {
    if (!stats) return 0;
 
@@ -37,20 +33,15 @@ function computeMuscleScore(stats?: MuscleSet): number {
 
    if (totalVolume === 0) return 0;
 
-   // Логарифмічний ріст: 2500 об'єму дає 100 балів (Зелений)
    const score = (Math.pow(totalVolume, 0.5) / 50) * 100;
    return Math.max(1, Math.min(100, score));
 }
 
 function scoreToColor(score: number): string {
-   if (score <= 0) return ""; // Повертаємо порожньо, компонент візьме emptyColor
-   const hue = (score / 100) * 120; // Від червоного (0) до зеленого (120)
+   if (score <= 0) return "";
+   const hue = (score / 100) * 120;
    return `hsl(${hue}, 85%, 55%)`;
 }
-
-/* ============================================================================
-   КОМПОНЕНТ
-============================================================================ */
 
 interface IWeightFoodProps {
    selectedDate: Date;
@@ -74,6 +65,21 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    const [draftStats, setDraftStats] = useState<MuscleSet>([{ w: "", r: "" }, { w: "", r: "" }, { w: "", r: "" }]);
    const [muscleStats, setMuscleStats] = useState<MuscleStats>({});
 
+   // Відновлення даних при зміні дати або завантаженні сторінки
+   useEffect(() => {
+      const dateKey = selectedDate.toISOString().split("T")[0];
+      const saved = localStorage.getItem(`muscleStats_${dateKey}`);
+      if (saved) {
+         try {
+            setMuscleStats(JSON.parse(saved));
+         } catch (e) {
+            setMuscleStats({});
+         }
+      } else {
+         setMuscleStats({});
+      }
+   }, [selectedDate]);
+
    const inputClasses = "mt-1 block w-full px-3 py-2 bg-white border border-brand-border rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green";
    const cardClasses = "p-4 bg-gray-50 rounded-lg shadow-sm border border-brand-border";
 
@@ -94,11 +100,15 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
 
    const saveMuscleData = () => {
       if (!selectedMuscle) return;
-      setMuscleStats((prev) => ({ ...prev, [selectedMuscle]: draftStats }));
+
+      const dateKey = selectedDate.toISOString().split("T")[0];
+      const updatedStats = { ...muscleStats, [selectedMuscle]: draftStats };
+
+      setMuscleStats(updatedStats);
+      localStorage.setItem(`muscleStats_${dateKey}`, JSON.stringify(updatedStats));
       setSelectedMuscle(null);
    };
 
-   // Генеруємо масив кольорів для всіх м'язів, щоб передати в SVG
    const currentMuscleColors: Record<string, string> = {};
    Object.keys(MUSCLE_EXERCISES).forEach((key) => {
       const score = computeMuscleScore(muscleStats[key as MuscleId]);
@@ -112,7 +122,6 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
          </h2>
 
          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Форми введення ваги */}
             <div className="space-y-4">
                <div>
                   <label htmlFor="morningWeight" className="block text-sm font-medium text-gray-700">
@@ -190,14 +199,12 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
          {message && <p className="text-sm text-green-600 mb-4 text-center">{message}</p>}
          <WeightChart unitPreferences={unitPreferences} currentMorningWeight={morningWeight?.toString() ?? null} currentEveningWeight={eveningWeight?.toString() ?? null} selectedDate={selectedDate} />
 
-         {/* ==================== MUSCLE MAP SECTION ==================== */}
          <div className="mt-10 border-t border-brand-border pt-8">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                <h2 className="text-lg sm:text-xl font-semibold text-brand-green-dark">
                   {t("muscle_map_title") || "Розвиток м'язів"}
                </h2>
 
-               {/* Перемикач Front / Back */}
                <div className="flex bg-gray-100 p-1 rounded-lg w-full sm:w-auto">
                   <button
                      type="button"
@@ -216,38 +223,29 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
                </div>
             </div>
 
-            {/* Рендеримо нову винесену карту */}
             <MuscleMap
                view={bodyView}
                muscleColors={currentMuscleColors}
                onMuscleClick={handleMuscleClick}
-               emptyColor="#e5e7eb" // Світло сірий для відсутності даних
             />
 
-            {/* АДАПТИВНА ЛЕГЕНДА КОЛЬОРІВ */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 mt-6 w-full px-4 max-w-lg mx-auto">
-
                <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-                  <div className="w-5 h-5 rounded bg-[#e5e7eb] border border-gray-300" />
+                  <div className="w-5 h-5 rounded bg-[#e2e8f0] border border-gray-300" />
                   <span>{t("no_data") || "Немає даних"}</span>
                </div>
 
-               {/* Градієнт блокується вертикально на мобільному */}
                <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto gap-2">
                   <div className="flex justify-between items-center sm:gap-3 text-sm text-gray-500 font-medium">
                      <span>{t("low") || "Слабо"}</span>
-                     {/* Десктоп лінія */}
                      <div className="hidden sm:block w-40 h-3 rounded-full" style={{ background: "linear-gradient(90deg, hsl(0,85%,55%), hsl(50,85%,55%), hsl(120,85%,55%))" }} />
                      <span>{t("high") || "Розвинено"}</span>
                   </div>
-                  {/* Мобільна лінія (під текстом) */}
                   <div className="sm:hidden w-full h-3 rounded-full mt-1" style={{ background: "linear-gradient(90deg, hsl(0,85%,55%), hsl(50,85%,55%), hsl(120,85%,55%))" }} />
                </div>
-
             </div>
          </div>
 
-         {/* ==================== MODAL ==================== */}
          {selectedMuscle && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 sm:p-7 max-h-[90vh] overflow-y-auto">
