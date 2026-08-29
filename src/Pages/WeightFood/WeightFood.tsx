@@ -65,19 +65,63 @@ export const WeightFood: React.FC<IWeightFoodProps> = ({ selectedDate }) => {
    const [draftStats, setDraftStats] = useState<MuscleSet>([{ w: "", r: "" }, { w: "", r: "" }, { w: "", r: "" }]);
    const [muscleStats, setMuscleStats] = useState<MuscleStats>({});
 
-   // Відновлення даних при зміні дати або завантаженні сторінки
+   // Відновлення даних при зміні дати або завантаженні сторінки (з легким фолбеком на останнє збереження)
    useEffect(() => {
       const dateKey = selectedDate.toISOString().split("T")[0];
+
+      // 1. Пряме збереження на вибрану дату
       const saved = localStorage.getItem(`muscleStats_${dateKey}`);
       if (saved) {
          try {
             setMuscleStats(JSON.parse(saved));
+            return;
          } catch (e) {
-            setMuscleStats({});
+            // Якщо збереження пошкоджене, продовжуємо пошук
          }
-      } else {
-         setMuscleStats({});
       }
+
+      // 2. Пошук збережень до цієї дати включно
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+         const key = localStorage.key(i);
+         if (key && key.startsWith("muscleStats_")) {
+            keys.push(key);
+         }
+      }
+
+      if (keys.length > 0) {
+         const dates = keys.map((k) => k.replace("muscleStats_", ""));
+         // Сортуємо дати за спаданням (від найновіших до найдавніших)
+         const pastOrCurrentDates = dates
+            .filter((d) => d <= dateKey)
+            .sort((a, b) => b.localeCompare(a));
+
+         if (pastOrCurrentDates.length > 0) {
+            const latestSaved = localStorage.getItem(`muscleStats_${pastOrCurrentDates[0]}`);
+            if (latestSaved) {
+               try {
+                  setMuscleStats(JSON.parse(latestSaved));
+                  return;
+               } catch (e) {
+                  // Провал парсингу
+               }
+            }
+         }
+
+         // Фолбек: якщо не знайшли збережень до цієї дати, беремо найновіше взагалі
+         const allDatesSorted = dates.sort((a, b) => b.localeCompare(a));
+         const latestSavedAny = localStorage.getItem(`muscleStats_${allDatesSorted[0]}`);
+         if (latestSavedAny) {
+            try {
+               setMuscleStats(JSON.parse(latestSavedAny));
+               return;
+            } catch (e) {
+               // Провал парсингу
+            }
+         }
+      }
+
+      setMuscleStats({});
    }, [selectedDate]);
 
    const inputClasses = "mt-1 block w-full px-3 py-2 bg-white border border-brand-border rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green";
