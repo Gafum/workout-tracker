@@ -91,7 +91,6 @@ export const MuscleMap: React.FC<MuscleMapProps> = ({
          [&_[aria-label*='male-body-outline']]:!fill-slate-600
          [&_[id='head']]:!opacity-100
          [&_[id='hair']]:!opacity-100
-         [&_[id='hair']]:!stroke-slate-600
 
          [&_[id='head']]:!fill-slate-600
          [&_[id='hair']]:!stroke-black

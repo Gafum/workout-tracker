@@ -25,6 +25,10 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    const listRef = useRef<HTMLDivElement>(null);
    const exercisesRef = useRef<IExerciseEntry[]>(exercises);
 
+   const animationFrameId = useRef<number | null>(null);
+   const activeScrollSpeed = useRef<number>(0);
+   const isDragging = useRef<boolean>(false);
+
    useEffect(() => {
       exercisesRef.current = exercises;
    }, [exercises]);
@@ -32,29 +36,92 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
    useEffect(() => {
       if (!listRef.current || exercises.length === 0) return;
 
+      const runScrollEngine = () => {
+         if (isDragging.current && activeScrollSpeed.current !== 0) {
+            const currentScroll = window.scrollY || document.documentElement.scrollTop;
+            window.scrollTo({
+               top: currentScroll + activeScrollSpeed.current,
+               behavior: "instant" as ScrollBehavior
+            });
+
+            animationFrameId.current = requestAnimationFrame(runScrollEngine);
+         } else {
+            animationFrameId.current = null;
+         }
+      };
+
+      const stopEngine = () => {
+         isDragging.current = false;
+         activeScrollSpeed.current = 0;
+         if (animationFrameId.current !== null) {
+            cancelAnimationFrame(animationFrameId.current);
+            animationFrameId.current = null;
+         }
+      };
+
+      const handleTouchMove = (e: TouchEvent | MouseEvent) => {
+         if (!isDragging.current) return;
+
+         let clientY = 0;
+         if ("touches" in e && e.touches.length > 0) {
+            clientY = e.touches[0].clientY;
+         } else if ("clientY" in e) {
+            clientY = (e as MouseEvent).clientY;
+         } else {
+            return;
+         }
+
+         const screenHeight = window.innerHeight;
+         const centerPoint = screenHeight / 2;
+
+         const deadZone = 80;
+
+         const startSpeed = 4;
+         const maxSpeed = 12;
+
+         if (clientY < centerPoint - deadZone) {
+            const progress = (centerPoint - deadZone - clientY) / (centerPoint - deadZone);
+            const speed = startSpeed + Math.pow(progress, 1.2) * (maxSpeed - startSpeed);
+            activeScrollSpeed.current = -speed;
+         } else if (clientY > centerPoint + deadZone) {
+            const progress = (clientY - (centerPoint + deadZone)) / (screenHeight - centerPoint - deadZone);
+            const speed = startSpeed + Math.pow(progress, 1.2) * (maxSpeed - startSpeed);
+            activeScrollSpeed.current = speed;
+         } else {
+            activeScrollSpeed.current = 0;
+         }
+
+         if (activeScrollSpeed.current !== 0 && animationFrameId.current === null) {
+            animationFrameId.current = requestAnimationFrame(runScrollEngine);
+         }
+      };
+
+      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      window.addEventListener("mousemove", handleTouchMove, { passive: true });
+      window.addEventListener("touchend", stopEngine, { passive: true });
+      window.addEventListener("mouseup", stopEngine, { passive: true });
+
       const sortable = new Sortable(listRef.current, {
          handle: ".drag-handle",
-         animation: 200,
+         animation: 150,
+         scroll: false,
 
-         delay: 300,
-         delayOnTouchOnly: true,
-         touchStartThreshold: 5,
-
-         scroll: true,
-         scrollSensitivity: 300,
-         scrollSpeed: 120,
-         bubbleScroll: true,
-         forceAutoScrollFallback: true,
+         forceFallback: true,
+         fallbackOnBody: true,
+         fallbackTolerance: 0,
 
          ghostClass: "opacity-20",
-         forceFallback: true,
          fallbackClass: "shadow-2xl",
 
-         onEnd: (evt) => {
-            const { oldIndex, newIndex, item } = evt;
-            if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+         onStart: () => {
+            isDragging.current = true;
+         },
 
-            item.scrollIntoView({ behavior: "smooth", block: "center" });
+         onEnd: (evt) => {
+            stopEngine();
+
+            const { oldIndex, newIndex } = evt;
+            if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
 
             if (onReorderExercises) {
                const currentList = [...exercisesRef.current];
@@ -63,10 +130,15 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
 
                onReorderExercises(currentList);
             }
-         }
+         },
       });
 
       return () => {
+         stopEngine();
+         window.removeEventListener("touchmove", handleTouchMove);
+         window.removeEventListener("mousemove", handleTouchMove);
+         window.removeEventListener("touchend", stopEngine);
+         window.removeEventListener("mouseup", stopEngine);
          sortable.destroy();
       };
    }, [exercises.length]);
