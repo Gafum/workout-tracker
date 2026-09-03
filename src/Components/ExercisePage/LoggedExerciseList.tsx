@@ -106,9 +106,14 @@ export const LoggedExerciseList: React.FC<ILoggedExerciseListProps> = ({
          animation: 150,
          scroll: false,
 
+         // --- НОВІ ПАРАМЕТРИ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ ---
+         delay: 250,                  // Затримка 250 мс перед тим, як елемент "схопиться"
+         delayOnTouchOnly: true,      // Затримка працюватиме ТІЛЬКИ на тач-пристроях (на ПК буде миттєво)
+         touchStartThreshold: 5,      // Якщо під час затримки палець зсунеться більше ніж на 5px - це вважатиметься скролом, і перетягування скасується
+
          forceFallback: true,
          fallbackOnBody: true,
-         fallbackTolerance: 0,
+         fallbackTolerance: 5,        // Змінено з 0 на 5, щоб мікро-тремтіння пальця не скасовувало дію
 
          ghostClass: "opacity-20",
          fallbackClass: "shadow-2xl",

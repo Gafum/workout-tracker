@@ -8,15 +8,15 @@ import { MuscleMap, type MuscleId } from "../../Components/WeightFoodPage/Muscle
 
 const MUSCLE_EXERCISES: Record<MuscleId, number[]> = {
    chest: [0, 24, 71],
-   back: [5, 4, 34],
+   back: [5, 34, 33],
    shoulders: [3, 12, 22],
-   biceps: [10, 39, 41],
-   triceps: [11, 8, 37],
-   abs: [18, 19, 21],
-   quads: [1, 14, 60],
-   hamstrings: [30, 15, 77],
-   calves: [17, 78, 79],
-   glutes: [32, 64, 9],
+   biceps: [10, 6, 85],
+   triceps: [8, 37],
+   abs: [19, 20, 21],
+   quads: [1, 14, 16],
+   hamstrings: [2, 75],
+   calves: [17, 78],
+   glutes: [1, 2, 14],
 };
 
 type MuscleSet = { w: string; r: string }[];
